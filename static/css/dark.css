@@ -1,8 +1,12 @@
 :root {
-  color-scheme: dark;
+    color-scheme: dark;
 }
 body {
-    background-color: #2d2d2d
+    background-color: #2d2d2d;
+}
+#reset {
+    background-color: #cf2929;
+    border: 1px solid #cf2929
 }
 #level-container, #toolbar {
     background-color: #4b4d4d;

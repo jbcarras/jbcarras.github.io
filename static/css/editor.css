@@ -11,6 +11,13 @@ button {
     border: 1px solid darkgray;
     padding: 5px;
     font-size: small;
+    cursor: pointer;
+}
+#reset {
+    background-color: red;
+    color: whitesmoke;
+    font-weight: bold;
+    border: 1px solid red;
 }
 input {
     margin-bottom: 2%;
@@ -47,6 +54,7 @@ select {
     background-color: whitesmoke;
     height: 90vh;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 #attributes-section {
     min-height: 25%;
@@ -67,6 +75,7 @@ select {
     align-content: start;
     justify-content: center;
     padding-top: 10px;
+    padding-bottom: 10px;
     box-shadow: 1px 1px 3px lightgray;
     border-radius: 5px;
 }

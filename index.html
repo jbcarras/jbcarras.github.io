@@ -16,21 +16,29 @@
                 <div id="settings">
                     <h2>Settings</h2>
                     <label for="name">Level Name</label>
-                    <input id="name" name="name" type="text">
+                    <input id="name" name="name" type="text" oninput="{
+                        const legal = /[a-z]|[0-9]|[!@#$^&()\-_+\[\]{}]/i
+                        this.value = Array.from(this.value).filter((char) => {return legal.test(char)}).join('')
+                    }">
+
                     <br/>
                     <label for="width">Width</label>
                     <input id="width" name="width" type="number" value="12" min="0" size="3" oninput="this.value = Math.max(this.value, 0)">
                     <label for="height">Height</label>
                     <input id="height" name="height" type="number" value="8" min="0" size="3" oninput="this.value = Math.max(this.value, 0)">
                     <br/>
-                    <button id="export">Export Level</button>
-                    <button id="reset">Reset Level</button>
+                    <button id="export">Export</button>
+                    <label for="level-import" style="display: none">Import from CSV</label>
+                    <input id="level-import" name="level-import" type="file" accept="text/csv" style="display: none" onchange="importLevel(this.files[this.files.length - 1])">
+                    <button onclick="document.getElementById('level-import').click()">Import</button>
+                    <button id="reset">Reset</button>
                     <br/>
                     <label for="dark-mode">Dark Mode</label>
-                    <input id="dark-mode" name="dark-mode" type="checkbox" onclick="setDarkMode(this.checked)">
+                    <input id="dark-mode" name="dark-mode" type="checkbox" onclick="setDarkMode(this.checked); document.styleSheets[0].insertRule('* {transition: background-color 0.25s linear, border 0.25s linear}')">
                 </div>
                 <hr/>
                 <div id="attributes-section">
+                    <h2>Level Editor</h2>
                     <p class="center">Click on a tile to start drawing it.</p>
                     <p class="center">Left Click - Draw</p>
                     <p class="center">Right Click - Erase</p>
@@ -90,6 +98,7 @@
     const tools = {
         "Eraser": new Item("Eraser", "Erase tiles you previously drew.", "", [], "Eraser.png", 1, ["topdown", "platformer"]),
         "Player": new Item("Player", "Where the player appears when the level is loaded.", "", [], "Player.png", 1, ["topdown", "platformer"]),
+        "Background": new Item("Background", "Set the filename for the level's background image.", "", [new Attribute("Filename", "", "text")], "BackgroundTool.png", 1, ["topdown", "platformer", "openworld", "sidescroller"])
     }
 
     const items = {
@@ -151,6 +160,8 @@
         renderAttributes()
     })
 
+    let backgroundFname = "Grass.png"
+
     type = typeSelect.value
     task = Number(taskSelect.value)
 
@@ -209,9 +220,56 @@
         }
     }
 
+    function importLevel(file) {
+        const reader = new FileReader()
+        reader.readAsText(file)
+        reader.onload = () => {
+            const lvl = reader.result.split("\n")
+            switch (lvl[0].split(',')[0]) {
+                case "TopDownLevel":
+                    typeSelect.value = "topdown"
+                    break
+                case "PlatformerLevel":
+                    typeSelect.value = "platformer"
+                    break
+                case "OpenWorldLevel":
+                    typeSelect.value = "openworld"
+                    break
+                case "SideScrollerLevel":
+                    typeSelect.value = "sidescroller"
+                    break
+                default:
+                    return
+            }
+            document.getElementById("name").value = lvl[0].split(',')[1]
+            document.getElementById("width").value = lvl[0].split(',')[2]
+            document.getElementById("height").value = lvl[0].split(',')[3]
+            resetLevel()
+            let width = lvl[1].split(',')[1]
+            let height = lvl[1].split(',')[2]
+            board[height][width] = `,Player,${width},${height}`
+            for (let line of lvl.slice(2)) {
+                if (line !== "") {
+                    let width = line.split(',')[2]
+                    let height = line.split(',')[3]
+                    board[height][width] = line + "\n"
+                }
+            }
+            for (let y = 0; y < board.length; y++) {
+                for (let x = 0; x < board[y].length; x++) {
+                    if (board[y][x] !== "") {
+                        const div = document.getElementById("level").children[y].children[x]
+                        div.style.backgroundImage = `url(${toolbarLookup[board[y][x].split(',')[1]].url})`
+                        div.textContent = board[y][x].split(',')[1]
+                    }
+                }
+            }
+        }
+    }
+
     function renderAttributes() {
         if (!Object.keys(toolbarLookup).includes(activeItem)) {
-            document.getElementById("attributes-section").innerHTML = "<p class=\"center\">Click on a tile to start drawing it.</p><p class=\"center\">Left Click - Draw</p> <p class=\"center\">Right Click - Erase</p>"
+            document.getElementById("attributes-section").innerHTML = "<h2>Level Editor</h2><p class=\"center\">Click on a tile to start drawing it.</p><p class=\"center\">Left Click - Draw</p> <p class=\"center\">Right Click - Erase</p>"
             return
         }
         let attributesSec = document.getElementById("attributes-section")
@@ -220,7 +278,6 @@
         let description = document.createElement("p")
         let attributes = document.createElement("div")
         attributes.id = "attributes"
-        console.log(activeItem)
         heading.textContent = toolbarLookup[activeItem].name
         description.textContent = toolbarLookup[activeItem].description
         attributesSec.append(heading, description)
@@ -233,8 +290,14 @@
             input.name = item.name
             input.type = item.inputType
             input.value = item.defaultVal
+            const legal = /[a-z]|[0-9]|[!@#$%^&*()\-_+=.?~`]/i;
+            input.oninput = (item) => {item.target.value = Array.from(item.target.value).filter((character) => {return legal.test(character)}).join('')}
             if (item.inputType !== "text") {
                 input.size = 5
+            }
+            if (item.name === "Filename") {
+                input.value = backgroundFname
+                input.addEventListener("change", (event) => {backgroundFname = event.target.value})
             }
             input.className = "attribute"
             attributes.append(label, input, document.createElement("br"))
@@ -335,16 +398,16 @@
     function exportLevel() {
         let name = document.getElementById("name").value === "" ? "level" : document.getElementById("name").value
         let out = ""
+        let startLocation = []
         for (let y = 0; y < board.length; y++) {
             for (let x = 0; x < board[y].length; x++) {
                 if (board[y][x].split(",")[1] === "Player") {
-                    out = "PlayerStartLocation,"+x+","+y+"\n" + out
+                    startLocation = [x, y]
                 } else {
                     out += board[y][x]
                 }
             }
         }
-
         let typePrettyName = ""
         switch (type) {
             case "topdown":
@@ -363,7 +426,7 @@
                 typePrettyName = type
         }
 
-        out = typePrettyName + "," + document.getElementById("width").value + "," + document.getElementById("height").value + "\n" + out
+        out = `${typePrettyName},${name},${board[0].length},${board.length}\nPlayerStartLocation,${startLocation[0]},${startLocation[1]}\nBackgroundImage,${backgroundFname}\n` + out
         const link = document.createElement("a")
         const file = new Blob([out], {type: "text/plain"})
         link.href = URL.createObjectURL(file)
