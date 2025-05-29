@@ -1,3 +1,6 @@
+:root {
+    --tile-size: 6.0vh
+}
 body {
     background-color: lightgray;
     font-family: sans-serif;
@@ -12,6 +15,13 @@ button {
     padding: 5px;
     font-size: small;
     cursor: pointer;
+}
+#zoom-box {
+    position: fixed;
+    background-color: whitesmoke;
+    padding: 8px;
+    margin: 4px;
+    border-radius: 5px;
 }
 #reset {
     background-color: red;
@@ -79,6 +89,13 @@ select {
     box-shadow: 1px 1px 3px lightgray;
     border-radius: 5px;
 }
+#tools, #tiles {
+    display: flex;
+    flex-wrap: wrap;
+    flex: 1;
+    align-content: start;
+    justify-content: center;
+}
 .toolbar-item {
     max-width: 7vh;
     min-width: 7vh;
@@ -115,8 +132,8 @@ select {
     box-sizing: border-box;
     border: 1px dashed gray;
     flex: 1;
-    min-width: 6.0vh;
-    padding-bottom: 6.0vh;
+    min-width: var(--tile-size);
+    padding-bottom: var(--tile-size);
     font-size: 0;
     cursor: pointer;
 }
