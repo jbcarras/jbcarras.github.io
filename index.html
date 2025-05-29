@@ -82,17 +82,17 @@
 
     const items = {
         "Wall": new Item("Wall", "A wall for top-down levels.", "StaticGameObject", [], "static/tiles/Wall.png", 1, ["topdown"]),
-        "PlatformerWall": new Item("PlatformerWall", "A wall for platformer levels. Accounts for gravity.", "StaticGameObject", [], "static/tiles/PlatformerWall.pngstatic/tiles/", 3, ["platformer"]),
-        "Player": new Item("Player", "Where the player appears when the level is loaded.", "n/a", [], "static/tiles/Player.pngstatic/tiles/", 1, ["topdown", "platformer"]),
-        "Demon": new Item("Demon", "Harms the player. May be able to move.", "DynamicGameObject", [new Attribute("MaxHP", 10, "number"), new Attribute("Strength", 3, "number")], "static/tiles/Enemy.pngstatic/tiles/", 1, ["topdown"]),
-        "AxePickup": new Item("AxePickup", "A slow-moving but strong projectile.", "StaticGameObject", [], "static/tiles/Axe.pngstatic/tiles/", 5, ["topdown"]),
-        "Goal": new Item("Goal", "Calls advanceLevel() when a Player collides.", "StaticGameObject", [], "static/tiles/Goal.pngstatic/tiles/", 1, ["topdown", "platformer"]),
-        "Potion": new Item("Potion", "A potion that heals Players who come in contact.", "StaticGameObject", [new Attribute("Heal", 10, "number")], "static/tiles/RedPotion.pngstatic/tiles/", 3, ["topdown", "platformer"]),
-        "PotionPickup": new Item("PotionPickup", "A potion that gets stored in a Player's inventory to be consumed later.", "StaticGameObject", [new Attribute("Heal", 10, "number")], "static/tiles/BluePotion.pngstatic/tiles/", 5, ["topdown", "platformer"]),
+        "PlatformerWall": new Item("PlatformerWall", "A wall for platformer levels. Accounts for gravity.", "StaticGameObject", [], "static/tiles/PlatformerWall.png", 3, ["platformer"]),
+        "Player": new Item("Player", "Where the player appears when the level is loaded.", "n/a", [], "static/tiles/Player.png", 1, ["topdown", "platformer"]),
+        "Demon": new Item("Demon", "Harms the player. May be able to move.", "DynamicGameObject", [new Attribute("MaxHP", 10, "number"), new Attribute("Strength", 3, "number")], "static/tiles/Enemy.png", 1, ["topdown"]),
+        "AxePickup": new Item("AxePickup", "A slow-moving but strong projectile.", "StaticGameObject", [], "static/tiles/Axe.png", 5, ["topdown"]),
+        "Goal": new Item("Goal", "Calls advanceLevel() when a Player collides.", "StaticGameObject", [], "static/tiles/Goal.png", 1, ["topdown", "platformer"]),
+        "Potion": new Item("Potion", "A potion that heals Players who come in contact.", "StaticGameObject", [new Attribute("Heal", 10, "number")], "static/tiles/RedPotion.png", 3, ["topdown", "platformer"]),
+        "PotionPickup": new Item("PotionPickup", "A potion that gets stored in a Player's inventory to be consumed later.", "StaticGameObject", [new Attribute("Heal", 10, "number")], "static/tiles/BluePotion.png", 5, ["topdown", "platformer"]),
         "Tower": new Item("Tower", "Indestructible immobile enemy tower.", "DynamicGameObject", [], "static/tiles/Tower.png')}}", 1, ["topdown"]),
-        "MagicPickup": new Item("MagicPickup", "A fast but weaker projectile.", "StaticGameObject", [], "static/tiles/Magic.pngstatic/tiles/", 5, ["topdown"]),
-        "Spike": new Item("Spike", "A fatal obstacle.", "StaticGameObject", [], "static/tiles/Spike.pngstatic/tiles/", 3, ["topdown", "platformer"]),
-        "SmartEnemy": new Item("SmartEnemy", "A smarter enemy that hunts the player down, avoiding walls.", "DynamicGameObject", [new Attribute("MaxHP", 10, "number"), new Attribute("Strength", 1, "number")], "static/tiles/SmartEnemy.pngstatic/tiles/", 6, ["topdown"])
+        "MagicPickup": new Item("MagicPickup", "A fast but weaker projectile.", "StaticGameObject", [], "static/tiles/Magic.png", 5, ["topdown"]),
+        "Spike": new Item("Spike", "A fatal obstacle.", "StaticGameObject", [], "static/tiles/Spike.png", 3, ["topdown", "platformer"]),
+        "SmartEnemy": new Item("SmartEnemy", "A smarter enemy that hunts the player down, avoiding walls.", "DynamicGameObject", [new Attribute("MaxHP", 10, "number"), new Attribute("Strength", 1, "number")], "static/tiles/SmartEnemy.png", 6, ["topdown"])
     }
 
     const selector = "static/tiles/Selector.png')}}"
