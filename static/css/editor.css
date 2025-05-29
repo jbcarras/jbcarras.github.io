@@ -45,6 +45,7 @@ select {
     height: 90vh;
     display: flex;
     flex-direction: column;
+    overflow-y: scroll;
 }
 #attributes-section {
     height: 25vh;
@@ -62,9 +63,7 @@ select {
 #toolbar {
     display: flex;
     flex-wrap: wrap;
-    flex: 1;
     align-content: start;
-    overflow-y: scroll;
     justify-content: center;
     padding-top: 10px;
     box-shadow: 1px 1px 3px lightgray;
