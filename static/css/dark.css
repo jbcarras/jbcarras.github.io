@@ -1,0 +1,17 @@
+body {
+    background-color: #2d2d2d
+}
+#level-container, #toolbar {
+    background-color: #4b4d4d;
+    box-shadow: 1px 1px 3px black
+}
+#secondary-container {
+    background-color: #1a1a1a
+}
+input, button, select {
+    background-color: #4b4d4d;
+    border: 1px solid #4b4d4d
+}
+h2, p, input, button, select, label {
+    color: whitesmoke
+}

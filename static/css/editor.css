@@ -1,0 +1,113 @@
+body {
+    background-color: lightgray;
+    font-family: sans-serif;
+}
+label {
+    font-weight: bold;
+    margin-right: 3px;
+}
+button {
+    border-radius: 5px;
+    border: 1px solid darkgray;
+    padding: 5px;
+    font-size: small;
+}
+input {
+    margin-bottom: 2%;
+    border-radius: 5px;
+    border: 1px solid darkgray;
+}
+hr {
+    width: 100%
+}
+#settings > * {
+    margin-bottom: 10px
+}
+#editor {
+    display: flex;
+    padding: 2%;
+    min-height: 90vh;
+    max-height: 90vh;
+    align-items: center;
+}
+select {
+    border-radius: 5px;
+    border: 1px solid darkgray;
+    padding: 5px;
+    font-size: small;
+    margin: 4px;
+}
+#secondary-container {
+    padding: 2%;
+    margin-left: 8px;
+    flex: 15;
+    background-color: whitesmoke;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+#attributes-section {
+    height: 25vh;
+    overflow-y: scroll;
+}
+#level-container {
+    flex: 85;
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+    box-shadow: 3px 2px 3px darkgray;
+    overflow: scroll;
+    background-color: whitesmoke;
+}
+#toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    flex: 1;
+    align-content: start;
+    overflow-y: scroll;
+    justify-content: center;
+    padding-top: 10px;
+    box-shadow: 1px 1px 3px lightgray;
+    border-radius: 5px;
+}
+.toolbar-item {
+    max-width: 7vh;
+    min-width: 7vh;
+    max-height: 7vh;
+    min-height: 7vh;
+    flex: 1;
+    background-size: contain;
+    cursor: pointer;
+    font-size: 0;
+}
+
+#selector {
+    min-width: 7vh;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-image: url("../../static/tiles/Selector.png");
+    min-height: 7vh;
+    z-index: 1;
+}
+#level {
+    margin: auto;
+    background-image: url('../tiles/Grass.png');
+    background-size: 10.0vh;
+    background-clip: content-box;
+    padding: 8vh;
+    flex-grow: 0;
+}
+.row {
+    display: flex;
+}
+.box {
+    background-size: contain;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    border: 1px dashed gray;
+    flex: 1;
+    min-width: 6.0vh;
+    padding-bottom: 6.0vh;
+    font-size: 0;
+    cursor: pointer;
+}
