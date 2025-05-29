@@ -1,0 +1,173 @@
+{
+  "tasks": ["Task 1", "Task 2", "Task 3", "Task 4", "Task 5", "Task 6", "Bonus"],
+  "types": {"topdown": "TopDownLevel", "platformer": "PlatformerLevel", "openworld": "OpenWorldLevel", "sidescroller":  "SideScrollerLevel"},
+  "items": {
+    "Wall": {
+      "name": "Wall",
+      "description": "A wall for top-down levels.",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "Wall.png",
+      "task": 1,
+      "allowedTypes": ["topdown", "openworld"]
+    },
+    "PlatformerWall": {
+      "name": "PlatformerWall",
+      "description": "A wall for platformer levels. Accounts for gravity.",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "PlatformerWall.png",
+      "task": 3,
+      "allowedTypes": ["platformer","sidescroller"]
+    },
+    "Demon": {
+      "name": "Demon",
+      "description": "Harms the player. May be able to move.",
+      "parent": "DynamicGameObject",
+      "attributes": [
+        {"name": "MaxHP", "defaultVal": 10, "inputType": "number"},
+        {"name": "Strength", "defaultVal": 3, "inputType": "number"}
+      ],
+      "url": "Enemy.png",
+      "task": 1,
+      "allowedTypes": ["topdown", "openworld"]
+    },
+    "AxePickup": {
+      "name": "AxePickup",
+      "description": "A slow-moving but strong projectile.",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "Axe.png",
+      "task": 5,
+      "allowedTypes": ["topdown", "openworld"]
+    },
+    "Goal": {
+      "name": "Goal",
+      "description": "Calls advanceLevel() when a Player collides.",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "Goal.png",
+      "task": 1,
+      "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
+    },
+    "Potion": {
+      "name": "Potion",
+      "description": "A potion that heals players who come in contact.",
+      "parent": "StaticGameObject",
+      "attributes": [
+        {"name": "Heal", "defaultVal": 10, "inputType": "number"}
+      ],
+      "url": "RedPotion.png",
+      "task": 3,
+      "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
+    },
+    "PotionPickup": {
+      "name": "PotionPickup",
+      "description": "A potion that gets stored in a player's inventory to be consumed later.",
+      "parent": "StaticGameObject",
+      "attributes": [
+        {"name": "Heal", "defaultVal": 10, "inputType": "number"}
+      ],
+      "url": "BluePotion.png",
+      "task": 5,
+      "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
+    },
+    "Tower": {
+      "name": "Tower",
+      "description": "An indestructible and immobile enemy tower.",
+      "parent": "DynamicGameObject",
+      "attributes": [],
+      "url": "Tower.png",
+      "task": 1,
+      "allowedTypes": ["topdown", "openworld"]
+    },
+    "MagicPickup": {
+      "name": "MagicPickup",
+      "description": "A fast but weaker projectile.",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "Magic.png",
+      "task": 5,
+      "allowedTypes": ["topdown", "openworld"]
+    },
+    "Spike": {
+      "name": "Spike",
+      "description": "A fatal obstacle.",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "Spike.png",
+      "task": 3,
+      "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
+    },
+    "SmartEnemy": {
+      "name": "SmartEnemy",
+      "description": "A smarter enemy that hunts the player down, avoiding walls.",
+      "parent": "DynamicGameObject",
+      "attributes": [
+        {"name": "MaxHP", "defaultVal": 10, "inputType": "number"},
+        {"name": "Strength", "defaultVal": 1, "inputType": "number"}
+      ],
+      "url": "SmartEnemy.png",
+      "task": 6,
+      "allowedTypes": ["topdown", "openworld"]
+    },
+    "Archer": {
+      "name": "Archer",
+      "description": "An enemy who fires harmful arrows at the player.",
+      "parent": "DynamicGameObject",
+      "attributes": [
+        {"name": "MaxHP", "defaultVal": 10, "inputType": "number"},
+        {"name": "Strength", "defaultVal": 1, "inputType": "number"}],
+      "url": "Archer.png",
+      "task": 7,
+      "allowedTypes": ["topdown", "openworld"]
+    },
+    "PushWall": {
+      "name": "PushWall",
+      "description": "A wall that gets pushed when collided with.",
+      "parent": "DynamicGameObject",
+      "attributes": [],
+      "url": "PushWall.png",
+      "task": 7,
+      "allowedTypes": ["topdown","openworld"]
+    },
+    "Platform": {
+      "name": "Platform",
+      "description": "A platform that can be jumped through.",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "Platform.png",
+      "task": 7,
+      "allowedTypes": ["platformer","sidescroller"]
+    },
+    "Ledge": {
+      "name": "Ledge",
+      "description": "A barrier that can be walked through from above, but not below.",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "Ledge.png",
+      "task": 7,
+      "allowedTypes": ["topdown","openworld"]
+    },
+    "InfoNode": {
+      "name": "InfoNode",
+      "description": "An interactable object that displays text.",
+      "parent": "StaticGameObject",
+      "attributes": [
+        {"name": "Text", "defaultVal": "", "inputType": "text"}
+      ],
+      "url": "InfoNode.png",
+      "task": 7,
+      "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
+    },
+    "Horse": {
+      "name": "Horse",
+      "description": "Immovable horse of destruction.",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "Horse.png",
+      "task": 7,
+      "allowedTypes": ["topdown", "openworld"]
+    }
+  }
+}
