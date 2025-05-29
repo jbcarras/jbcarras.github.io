@@ -186,7 +186,7 @@ function renderAttributes() {
         input.name = item.name
         input.type = item.inputType
         input.value = item.defaultVal
-        const legal = /[a-z]|[0-9]|[!@#$%^&*()\-_+=.?~`]/i;
+        const legal = /[a-z]|[0-9]|[\s!@#$%^&*()\-_+=.?~`]/i;
         input.oninput = (item) => {
             item.target.value = Array.from(item.target.value).filter((character) => {
                 return legal.test(character)
@@ -351,7 +351,9 @@ function importLevel(file) {
         let width = lvl[1].split(',')[1]
         let height = lvl[1].split(',')[2]
         board[height][width] = `,Player,${width},${height}`
-        for (let line of lvl.slice(2)) {
+        document.getElementById("bg-filename").value = lvl[2].split(',')[1]
+        document.getElementById("bg-tiled").checked = lvl[2].split(',')[0] === "BackgroundTile"
+        for (let line of lvl.slice(3)) {
             if (line !== "") {
                 let width = line.split(',')[2]
                 let height = line.split(',')[3]
