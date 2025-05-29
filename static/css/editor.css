@@ -20,6 +20,9 @@ input {
 hr {
     width: 100%
 }
+.center {
+    text-align: center;
+}
 #settings > * {
     margin-bottom: 10px
 }
@@ -43,13 +46,10 @@ select {
     flex: 15;
     background-color: whitesmoke;
     height: 90vh;
-    display: flex;
-    flex-direction: column;
     overflow-y: scroll;
 }
 #attributes-section {
-    height: 25vh;
-    overflow-y: scroll;
+    min-height: 25%;
 }
 #level-container {
     flex: 85;
@@ -63,6 +63,7 @@ select {
 #toolbar {
     display: flex;
     flex-wrap: wrap;
+    flex: 1;
     align-content: start;
     justify-content: center;
     padding-top: 10px;

@@ -31,11 +31,14 @@
                 </div>
                 <hr/>
                 <div id="attributes-section">
-
+                    <p class="center">Click on a tile to start drawing it.</p>
+                    <p class="center">Left Click - Draw</p>
+                    <p class="center">Right Click - Erase</p>
                 </div>
                 <br/>
                 <hr/>
-                <div id="toolbar-settings">
+                <div id="toolbar-container">
+                    <div id="toolbar-settings">
                     <label for="task">Progress</label>
                     <select id="task" name="task">
                         <option value="1">Task 1</option>
@@ -43,16 +46,20 @@
                         <option value="3">Task 3</option>
                         <option value="4">Task 4</option>
                         <option value="5">Task 5</option>
-                        <option value="6" selected>Task 6</option>
+                        <option value="6">Task 6</option>
+                        <option value="7" selected>Bonus</option>
                     </select>
                     <br/>
                     <label for="type">Level Type</label>
                     <select id="type" name="type">
                         <option value="topdown" selected>TopDownLevel</option>
                         <option value="platformer">PlatformerLevel</option>
+                        <option value="openworld">OpenWorldLevel</option>
+                        <option value="sidescroller">SideScrollerLevel</option>
                     </select>
                 </div>
                 <div id="toolbar"></div>
+                </div>
                 <hr/>
             </div>
     </div>
@@ -74,33 +81,45 @@
             this.description = description
             this.parent = parent
             this.attributes = attributes
-            this.url = url
+            this.url = "static/tiles/" + url
             this.task = task
             this.allowedTypes = allowedTypes
         }
     }
 
-    const items = {
-        "Wall": new Item("Wall", "A wall for top-down levels.", "StaticGameObject", [], "static/tiles/Wall.png", 1, ["topdown"]),
-        "PlatformerWall": new Item("PlatformerWall", "A wall for platformer levels. Accounts for gravity.", "StaticGameObject", [], "static/tiles/PlatformerWall.png", 3, ["platformer"]),
-        "Player": new Item("Player", "Where the player appears when the level is loaded.", "n/a", [], "static/tiles/Player.png", 1, ["topdown", "platformer"]),
-        "Demon": new Item("Demon", "Harms the player. May be able to move.", "DynamicGameObject", [new Attribute("MaxHP", 10, "number"), new Attribute("Strength", 3, "number")], "static/tiles/Enemy.png", 1, ["topdown"]),
-        "AxePickup": new Item("AxePickup", "A slow-moving but strong projectile.", "StaticGameObject", [], "static/tiles/Axe.png", 5, ["topdown"]),
-        "Goal": new Item("Goal", "Calls advanceLevel() when a Player collides.", "StaticGameObject", [], "static/tiles/Goal.png", 1, ["topdown", "platformer"]),
-        "Potion": new Item("Potion", "A potion that heals Players who come in contact.", "StaticGameObject", [new Attribute("Heal", 10, "number")], "static/tiles/RedPotion.png", 3, ["topdown", "platformer"]),
-        "PotionPickup": new Item("PotionPickup", "A potion that gets stored in a Player's inventory to be consumed later.", "StaticGameObject", [new Attribute("Heal", 10, "number")], "static/tiles/BluePotion.png", 5, ["topdown", "platformer"]),
-        "Tower": new Item("Tower", "Indestructible immobile enemy tower.", "DynamicGameObject", [], "static/tiles/Tower.png", 1, ["topdown"]),
-        "MagicPickup": new Item("MagicPickup", "A fast but weaker projectile.", "StaticGameObject", [], "static/tiles/Magic.png", 5, ["topdown"]),
-        "Spike": new Item("Spike", "A fatal obstacle.", "StaticGameObject", [], "static/tiles/Spike.png", 3, ["topdown", "platformer"]),
-        "SmartEnemy": new Item("SmartEnemy", "A smarter enemy that hunts the player down, avoiding walls.", "DynamicGameObject", [new Attribute("MaxHP", 10, "number"), new Attribute("Strength", 1, "number")], "static/tiles/SmartEnemy.png", 6, ["topdown"])
+    const tools = {
+        "Eraser": new Item("Eraser", "Erase tiles you previously drew.", "", [], "Eraser.png", 1, ["topdown", "platformer"]),
+        "Player": new Item("Player", "Where the player appears when the level is loaded.", "", [], "Player.png", 1, ["topdown", "platformer"]),
     }
 
-    const selector = "static/tiles/Selector.png')}}"
+    const items = {
+        "Wall": new Item("Wall", "A wall for top-down levels.", "StaticGameObject", [], "Wall.png", 1, ["topdown", "openworld"]),
+        "PlatformerWall": new Item("PlatformerWall", "A wall for platformer levels. Accounts for gravity.", "StaticGameObject", [], "PlatformerWall.png", 3, ["platformer", "sidescroller"]),
+        "Demon": new Item("Demon", "Harms the player. May be able to move.", "DynamicGameObject", [new Attribute("MaxHP", 10, "number"), new Attribute("Strength", 3, "number")], "Enemy.png", 1, ["topdown", "openworld"]),
+        "AxePickup": new Item("AxePickup", "A slow-moving but strong projectile.", "StaticGameObject", [], "Axe.png", 5, ["topdown", "openworld"]),
+        "Goal": new Item("Goal", "Calls advanceLevel() when a Player collides.", "StaticGameObject", [], "Goal.png", 1, ["topdown", "platformer", "openworld", "sidescroller"]),
+        "Potion": new Item("Potion", "A potion that heals Players who come in contact.", "StaticGameObject", [new Attribute("Heal", 10, "number")], "RedPotion.png", 3, ["topdown", "platformer", "openworld", "sidescroller"]),
+        "PotionPickup": new Item("PotionPickup", "A potion that gets stored in a Player's inventory to be consumed later.", "StaticGameObject", [new Attribute("Heal", 10, "number")], "BluePotion.png", 5, ["topdown", "platformer", "openworld", "sidescroller"]),
+        "Tower": new Item("Tower", "Indestructible immobile enemy tower.", "DynamicGameObject", [], "Tower.png", 1, ["topdown", "openworld"]),
+        "MagicPickup": new Item("MagicPickup", "A fast but weaker projectile.", "StaticGameObject", [], "Magic.png", 5, ["topdown", "openworld"]),
+        "Spike": new Item("Spike", "A fatal obstacle.", "StaticGameObject", [], "Spike.png", 3, ["topdown", "platformer", "openworld", "sidescroller"]),
+        "SmartEnemy": new Item("SmartEnemy", "A smarter enemy that hunts the player down, avoiding walls.", "DynamicGameObject", [new Attribute("MaxHP", 10, "number"), new Attribute("Strength", 1, "number")], "SmartEnemy.png", 6, ["topdown", "openworld"]),
+        "Archer": new Item("Archer", "An enemy who fires harmful arrows at the player.", "DynamicGameObject", [new Attribute("MaxHP", 10, "number"), new Attribute("Strength", 1, "number")], "Archer.png", 7, ["topdown", "openworld"]),
+        "PushWall": new Item("PushWall", "A wall that gets pushed when collided with.", "DynamicGameObject", [], "PushWall.png", 7, ["topdown", "openworld"]),
+        "Platform": new Item("Platform", "A platform that can be jumped through.", "StaticGameObject", [], "Platform.png", 7, ["platformer", "sidescroller"]),
+        "Ledge": new Item("Ledge", "A barrier that can be walked through from above, but not below.", "StaticGameObject", [], "Ledge.png", 7, ["topdown", "openworld"]),
+        "InfoNode": new Item("InfoNode", "An interactable object that displays text.", "StaticGameObject", [new Attribute("Text", "", "text")], "InfoNode.png", 7, ["topdown", "openworld", "sidescroller", "platformer"]),
+        "Horse": new Item("Horse", "Immovable horse of destruction.", "StaticGameObject", [], "Horse.png", 7, ["topdown", "openworld"])
+    }
+
+    const toolbarLookup = {...tools, ...items}
+
+    const selector = "static/tiles/Selector.png"
 
     let board = []
 
-    let activeItem = "Wall"
-    let task = 6
+    let activeItem = ""
+    let task = 7
     let type = "topdown"
 
     let toolbar = document.getElementById("toolbar")
@@ -115,23 +134,28 @@
     const taskSelect = document.getElementById("task")
     taskSelect.addEventListener("change", () => {
         task = Number(taskSelect.value)
+        if (activeItem === "" || toolbarLookup[activeItem].task > task) {
+            activeItem = ""
+        }
         renderToolbar()
+        renderAttributes()
     })
 
     const typeSelect = document.getElementById("type")
     typeSelect.addEventListener("change", () => {
         type = typeSelect.value
         renderToolbar()
-        setActiveItemTo(Array.from(document.getElementById("toolbar").children).includes(activeItem) ? activeItem : document.getElementById("toolbar").children[0])
+        if (activeItem === "" || !toolbarLookup[activeItem].allowedTypes.includes(type)) {
+            activeItem = ""
+        }
+        renderAttributes()
     })
 
     type = typeSelect.value
     task = Number(taskSelect.value)
 
     resetLevel()
-    renderAttributes()
     renderToolbar()
-    setActiveItemTo(toolbar.children[0])
 
     if (localStorage.getItem("theme") === "dark") {
         setDarkMode(true)
@@ -148,7 +172,25 @@
 
     function renderToolbar() {
         document.getElementById("toolbar").innerHTML = ""
-        let legalItems = Object.entries(items).filter(([item, itemInstance]) => {return (itemInstance.task <= task && itemInstance.allowedTypes.includes(type))})
+        for (const [item, itemInstance] of Object.entries(tools)) {
+            const toolbarItem = document.createElement("div")
+            toolbarItem.className = "toolbar-item"
+            toolbarItem.textContent = itemInstance.name
+            toolbarItem.style.backgroundImage = "url("+itemInstance.url+")"
+
+            toolbarItem.addEventListener("click", setActiveItem)
+
+            if (item === activeItem) {
+                const selector = document.createElement("div")
+                selector.id = "selector"
+                selector.style.backgroundImage = "url("+selector+")"
+                toolbarItem.append(selector)
+            }
+            toolbar.append(toolbarItem)
+        }
+        toolbar.append(document.createElement("hr"))
+
+        let legalItems = Object.entries(items).filter(([item, itemInstance]) => {return (itemInstance.task <= task && itemInstance.allowedTypes.includes(type) && !Object.keys(tools).includes(item))})
         for (const [item, itemInstance] of legalItems) {
             const toolbarItem = document.createElement("div")
             toolbarItem.className = "toolbar-item"
@@ -168,16 +210,21 @@
     }
 
     function renderAttributes() {
+        if (!Object.keys(toolbarLookup).includes(activeItem)) {
+            document.getElementById("attributes-section").innerHTML = "<p class=\"center\">Click on a tile to start drawing it.</p><p class=\"center\">Left Click - Draw</p> <p class=\"center\">Right Click - Erase</p>"
+            return
+        }
         let attributesSec = document.getElementById("attributes-section")
         attributesSec.innerHTML = ""
         let heading = document.createElement("h2")
         let description = document.createElement("p")
-        heading.textContent = items[activeItem].name
-        description.textContent = items[activeItem].description
-        attributesSec.append(heading, description)
         let attributes = document.createElement("div")
         attributes.id = "attributes"
-        items[activeItem].attributes.forEach((item) => {
+        console.log(activeItem)
+        heading.textContent = toolbarLookup[activeItem].name
+        description.textContent = toolbarLookup[activeItem].description
+        attributesSec.append(heading, description)
+        toolbarLookup[activeItem].attributes.forEach((item) => {
             let label = document.createElement("label")
             let input = document.createElement("input")
             label.for = item.name
@@ -186,7 +233,9 @@
             input.name = item.name
             input.type = item.inputType
             input.value = item.defaultVal
-            input.size = 5
+            if (item.inputType !== "text") {
+                input.size = 5
+            }
             input.className = "attribute"
             attributes.append(label, input, document.createElement("br"))
         })
@@ -211,10 +260,14 @@
 
     function mouseDownEvent(event) {
         event.preventDefault();
-        if (event.button === 0) {
+        if (activeItem === "") {
+            return
+        }
+        let option = activeItem === "Eraser" ? 2 : event.button
+        if (option === 0) {
             drawEvent(event)
             level.addEventListener("mouseover", drawEvent)
-        } else if (event.button === 2) {
+        } else if (option === 2) {
             eraseEvent(event)
             level.addEventListener("mouseover", eraseEvent)
         }
@@ -231,13 +284,13 @@
             }
 
             event.target.id = activeItem === "Player" ? "player" : ""
-            event.target.style.backgroundImage = "url("+items[activeItem].url+")"
+            event.target.style.backgroundImage = "url("+toolbarLookup[activeItem].url+")"
             event.target.textContent = activeItem
 
             let attributes = document.getElementsByClassName("attribute").length !== 0 ? "," + Array.from(document.getElementsByClassName("attribute")).map((element) => element.value).reduce((a, b) => a+","+b) : ""
 
 
-            board[Number(event.target.dataset.y)][Number(event.target.dataset.x)] = items[activeItem].parent+","+items[activeItem].name+","+event.target.dataset.x+","+event.target.dataset.y+attributes+"\n"
+            board[Number(event.target.dataset.y)][Number(event.target.dataset.x)] = toolbarLookup[activeItem].parent+","+toolbarLookup[activeItem].name+","+event.target.dataset.x+","+event.target.dataset.y+attributes+"\n"
         }
         level.addEventListener("mouseup", () => {level.removeEventListener("mouseover", drawEvent)})
     }
@@ -280,6 +333,7 @@
     }
 
     function exportLevel() {
+        let name = document.getElementById("name").value === "" ? "level" : document.getElementById("name").value
         let out = ""
         for (let y = 0; y < board.length; y++) {
             for (let x = 0; x < board[y].length; x++) {
@@ -290,11 +344,30 @@
                 }
             }
         }
-        out = type + "\n" + out
+
+        let typePrettyName = ""
+        switch (type) {
+            case "topdown":
+                typePrettyName = "TopDownLevel"
+                break
+            case "platformer":
+                typePrettyName = "PlatformerLevel"
+                break
+            case "openworld":
+                typePrettyName = "OpenWorldLevel"
+                break
+            case "sidescroller":
+                typePrettyName = "SideScrollerLevel"
+                break
+            default:
+                typePrettyName = type
+        }
+
+        out = typePrettyName + "," + document.getElementById("width").value + "," + document.getElementById("height").value + "\n" + out
         const link = document.createElement("a")
         const file = new Blob([out], {type: "text/plain"})
         link.href = URL.createObjectURL(file)
-        link.download = document.getElementById("name").value + ".txt"
+        link.download = name + ".csv"
         link.click()
         URL.revokeObjectURL(link.href)
     }
