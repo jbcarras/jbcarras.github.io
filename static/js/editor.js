@@ -1,11 +1,3 @@
-class Attribute {
-    constructor(name, defaultVal, inputType) {
-        this.name = name
-        this.defaultVal = defaultVal
-        this.inputType = inputType
-    }
-}
-
 class Item {
     constructor(name, description, parent, attributes, url, task, allowedTypes) {
         this.name = name
@@ -29,48 +21,18 @@ let items = {}
 
 const selector = `static/tiles/Selector.png`
 
-let board = []
-
-let activeItem = ""
-let task = 7
-let type = "topdown"
-
 let toolbar = document.getElementById("toolbar")
 let level = document.getElementById("level")
 
 let types = {}
 
-const reset = document.getElementById("reset")
-reset.addEventListener("click", resetLevel)
-
-const exportBtn = document.getElementById("export")
-exportBtn.addEventListener("click", exportLevel)
-
-const taskSelect = document.getElementById("task")
-taskSelect.addEventListener("change", () => {
-    task = Number(taskSelect.value)
-    if (activeItem === "" || toolbarLookup[activeItem].task > task) {
-        activeItem = ""
-    }
-    renderToolbar()
-    renderAttributes()
-})
-
-const typeSelect = document.getElementById("type")
-typeSelect.addEventListener("change", () => {
-    type = typeSelect.value
-    renderToolbar()
-    if (activeItem === "" || !toolbarLookup[activeItem].allowedTypes.includes(type)) {
-        activeItem = ""
-    }
-    renderAttributes()
-})
-
 let backgroundFname = "Grass.png"
 let bgTiled= true
 
-type = typeSelect.value
-task = Number(taskSelect.value)
+let activeItem = ""
+let type = ""
+let task = 0
+let board = []
 
 initEditor()
 
@@ -85,16 +47,38 @@ if (localStorage.getItem("theme") === "dark") {
 function initEditor() {
     document.getElementById("eraser-button").addEventListener("click", (event) => {setActiveItem(event)})
     document.getElementById("player-button").addEventListener("click", (event) => setActiveItem(event))
+    const reset = document.getElementById("reset")
+    reset.addEventListener("click", resetLevel)
 
-    let editorData = {}
+    const exportBtn = document.getElementById("export")
+    exportBtn.addEventListener("click", exportLevel)
+
+    const taskSelect = document.getElementById("task")
+    taskSelect.addEventListener("change", () => {
+        task = Number(taskSelect.value)
+        if (activeItem === "" || toolbarLookup[activeItem].task > task) {
+            activeItem = ""
+        }
+        renderToolbar()
+        renderAttributes()
+    })
+
+    const typeSelect = document.getElementById("type")
+    typeSelect.addEventListener("change", () => {
+        type = typeSelect.value
+        renderToolbar()
+        if (activeItem === "" || !toolbarLookup[activeItem].allowedTypes.includes(type)) {
+            activeItem = ""
+        }
+        renderAttributes()
+    })
     fetch("static/editor.json").then(
         (response) => {
             return response.json()
         }).then(data => {
-            editorData = data
-            initTasks(editorData["tasks"])
-            initTypes(editorData["types"])
-            initItems(editorData["items"])
+            initTasks(data["tasks"])
+            initTypes(data["types"])
+            initItems(data["items"])
             resetLevel()
         renderToolbar()
         })
@@ -128,7 +112,9 @@ function initTypes(loadedTypes) {
 function initItems(loadedItems) {
     items = loadedItems
     for ([item, itemEntry] of Object.entries(loadedItems)) {
-        items[item] = new Item(itemEntry["name"], itemEntry["description"], itemEntry["parent"], itemEntry["attributes"], itemEntry["url"], itemEntry["task"], itemEntry["allowedTypes"])
+        items[item] = new Item(itemEntry["name"], itemEntry["description"],
+            itemEntry["parent"], itemEntry["attributes"], itemEntry["url"],
+            itemEntry["task"], itemEntry["allowedTypes"])
     }
     toolbarLookup = {...tools, ...items}
 }
@@ -216,8 +202,13 @@ function setActiveItem(event) {
     selector.id = "selector"
     selector.style.backgroundImage = "url(" + selector + ")"
     item.append(selector)
-    activeItem = item.textContent
+    activeItem = toolbarLookup[item.textContent].name
     renderAttributes()
+}
+
+function setTiledBackground(to) {
+    bgTiled = to
+
 }
 
 function mouseDownEvent(event) {
@@ -256,17 +247,6 @@ function toolHandler(event) {
             }
             event.target.id = "player"
             break
-        case "Settings":
-            document.getElementById("settings").style.display = ""
-            if (document.getElementById("selector") != null) {
-                document.getElementById("selector").remove()
-            }
-            const selector = document.createElement("div")
-            selector.id = "selector"
-            selector.style.backgroundImage = "url(" + selector + ")"
-            item.append(selector)
-            activeItem = item.textContent
-            renderAttributes()
     }
 }
 
@@ -276,7 +256,7 @@ function drawEvent(event) {
             toolHandler(event)
         }
         event.target.style.backgroundImage = "url(" + toolbarLookup[activeItem].url + ")"
-        event.target.textContent = activeItem
+        event.target.textContent = toolbarLookup[activeItem]
         event.target.dataset.type = "tile"
         let attributes = document.getElementsByClassName("attribute").length !== 0 ? "," + Array.from(document.getElementsByClassName("attribute")).map((element) => element.value).reduce((a, b) => a + "," + b) : ""
         board[Number(event.target.dataset.y)][Number(event.target.dataset.x)] = toolbarLookup[activeItem].parent + "," + toolbarLookup[activeItem].name + "," + event.target.dataset.x + "," + event.target.dataset.y + attributes + "\n"
@@ -328,22 +308,8 @@ function importLevel(file) {
     reader.readAsText(file)
     reader.onload = () => {
         const lvl = reader.result.split("\n")
-        switch (lvl[0].split(',')[0]) {
-            case "TopDownLevel":
-                typeSelect.value = "topdown"
-                break
-            case "PlatformerLevel":
-                typeSelect.value = "platformer"
-                break
-            case "OpenWorldLevel":
-                typeSelect.value = "openworld"
-                break
-            case "SideScrollerLevel":
-                typeSelect.value = "sidescroller"
-                break
-            default:
-                return
-        }
+        const typeSelect = document.getElementById("type")
+        typeSelect.value = Object.keys(types).find((type) => {return types[type] === lvl[0].split(',')[0]})
         document.getElementById("name").value = lvl[0].split(',')[1]
         document.getElementById("width").value = lvl[0].split(',')[2]
         document.getElementById("height").value = lvl[0].split(',')[3]
@@ -373,7 +339,7 @@ function importLevel(file) {
 }
 
 function exportLevel() {
-    let name = document.getElementById("name").value === "" ? "level" : document.getElementById("name").value
+    let lvlName = document.getElementById("name").value === "" ? "level" : document.getElementById("name").value
     let out = ""
     let startLocation = []
     for (let y = 0; y < board.length; y++) {
@@ -385,29 +351,13 @@ function exportLevel() {
             }
         }
     }
-    let typePrettyName = ""
-    switch (type) {
-        case "topdown":
-            typePrettyName = "TopDownLevel"
-            break
-        case "platformer":
-            typePrettyName = "PlatformerLevel"
-            break
-        case "openworld":
-            typePrettyName = "OpenWorldLevel"
-            break
-        case "sidescroller":
-            typePrettyName = "SideScrollerLevel"
-            break
-        default:
-            typePrettyName = type
-    }
+    let lvlTypePrettyName = Object.keys(types).includes(type) ? types[type] : "MissingType"
 
-    out = `${typePrettyName},${name},${board[0].length},${board.length}\nPlayerStartLocation,${startLocation[0]},${startLocation[1]}\n${bgTiled ? "BackgroundTile" : "BackgroundImage"},${backgroundFname}\n` + out
+    out = `${lvlTypePrettyName},${lvlName},${board[0].length},${board.length}\nPlayerStartLocation,${startLocation[0]},${startLocation[1]}\n${bgTiled ? "BackgroundTile" : "BackgroundImage"},${backgroundFname}\n` + out
     const link = document.createElement("a")
     const file = new Blob([out], {type: "text/plain"})
     link.href = URL.createObjectURL(file)
-    link.download = name + ".csv"
+    link.download = lvlName + ".csv"
     link.click()
     URL.revokeObjectURL(link.href)
 }

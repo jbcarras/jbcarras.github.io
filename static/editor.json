@@ -1,6 +1,7 @@
 {
-  "tasks": ["Task 1", "Task 2", "Task 3", "Task 4", "Task 5", "Task 6", "Bonus"],
+  "tasks": ["Task 1", "Task 2", "Task 3", "Task 4", "Task 5", "Task 6", "Bonus", "Mario"],
   "types": {"topdown": "TopDownLevel", "platformer": "PlatformerLevel", "openworld": "OpenWorldLevel", "sidescroller":  "SideScrollerLevel"},
+  "backgrounds": [{"url": "Grass.png", "tiled": true, "location": []},{}],
   "items": {
     "Wall": {
       "name": "Wall",
@@ -168,6 +169,159 @@
       "url": "Horse.png",
       "task": 7,
       "allowedTypes": ["topdown", "openworld"]
+    },
+    "QuestionBlock": {
+      "name": "QuestionBlock",
+      "description": "",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "QuestionBlock.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "Block": {
+      "name": "Block",
+      "description": "",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "Block.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "UpPipeLeft": {
+      "name": "UpPipeLeft",
+      "description": "",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "UpPipeLeft.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "UpPipeRight": {
+      "name": "UpPipeRight",
+      "description": "",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "UpPipeRight.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "UpPipeTopLeft": {
+      "name": "UpPipeTopLeft",
+      "description": "",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "UpPipeTopLeft.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "UpPipeTopRight": {
+      "name": "UpPipeTopRight",
+      "description": "",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "UpPipeTopRight.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "HiddenBlock": {
+      "name": "HiddenBlock",
+      "description": "",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "Selector.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "Bricks": {
+      "name": "Bricks",
+      "description": "",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "Bricks.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "Ground": {
+      "name": "Ground",
+      "description": "",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "Ground.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "Flag": {
+      "name": "Flag",
+      "description": "",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "Flag.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "Flagpole": {
+      "name": "Flagpole",
+      "description": "",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "Flagpole.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "FlagTip": {
+      "name": "FlagTip",
+      "description": "",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "FlagTip.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "FlagTop": {
+      "name": "FlagTop",
+      "description": "",
+      "parent": "StaticGameObject",
+      "attributes": [],
+      "url": "FlagTop.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "Goomba": {
+      "name": "Goomba",
+      "description": "",
+      "parent": "DynamicGameObject",
+      "attributes": [],
+      "url": "Goomba.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "Turtle": {
+      "name": "Turtle",
+      "description": "",
+      "parent": "DynamicGameObject",
+      "attributes": [],
+      "url": "Turtle.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "BuzzyBeetle": {
+      "name": "BuzzyBeetle",
+      "description": "",
+      "parent": "DynamicGameObject",
+      "attributes": [],
+      "url": "BuzzyBeetle.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
+    },
+    "Mario": {
+      "name": "Mario",
+      "description": "",
+      "parent": "DynamicGameObject",
+      "attributes": [],
+      "url": "Mario.png",
+      "task": 8,
+      "allowedTypes": ["sidescroller"]
     }
   }
 }

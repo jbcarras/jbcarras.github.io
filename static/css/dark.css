@@ -8,6 +8,9 @@ body {
     background-color: #cf2929;
     border: 1px solid #cf2929
 }
+#zoom-box {
+    box-shadow: 1px 1px 3px black;
+}
 #level-container, #toolbar {
     background-color: #4b4d4d;
     box-shadow: 1px 1px 3px black

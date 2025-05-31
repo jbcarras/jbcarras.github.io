@@ -14,7 +14,7 @@
         <div id="level"></div>
         <div id="zoom-box">
             <label for="zoom">Zoom</label>
-            <input name="zoom" id="zoom" type="range" min="10" max="100" value="50" onload="document.querySelector(':root').style.setProperty('--tile-size', `${12.0 * this.value / 100}vh`)" onchange="document.querySelector(':root').style.setProperty('--tile-size', `${12.0 * this.value / 100}vh`)">
+            <input name="zoom" id="zoom" type="range" min="10" max="100" value="50" onchange="document.querySelector(':root').style.setProperty('--tile-size', `${12.0 * this.value / 100}vh`)">
         </div>
     </div>
     <div id="secondary-container">
@@ -22,7 +22,7 @@
             <h2>Settings</h2>
             <label for="name">Level Name</label>
             <input id="name" name="name" type="text" oninput="{
-                        const legal = /[a-z]|[0-9]|[\s@#$^&()\-_+\[\]{}]/i
+                        const legal = /[a-z]|[0-9]|[!@#$^&()\-_+\[\]{}]/i
                         this.value = Array.from(this.value).filter((char) => {return legal.test(char)}).join('')
                     }">
 
@@ -30,6 +30,7 @@
             <label for="width">Width</label>
             <input id="width" name="width" type="number" value="12" min="0" size="3"
                    oninput="this.value = Math.max(this.value, 0)">
+            <br/>
             <label for="height">Height</label>
             <input id="height" name="height" type="number" value="8" min="0" size="3"
                    oninput="this.value = Math.max(this.value, 0)">
