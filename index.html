@@ -42,12 +42,17 @@
             <button onclick="document.getElementById('level-import').click()">Import</button>
             <button id="reset">Reset</button>
             <br/>
-            <label for="bg-filename">Background Filename</label>
-            <input id="bg-filename" name="bg-filename" type="text" value="Grass.png" onload="backgroundFname = this.value" onchange="backgroundFname = this.value">
-            <br/>
-            <label for="bg-tiled">Tiled Background</label>
-            <input id="bg-tiled" name="bg-tiled" type="checkbox" checked onload="bgTiled = this.checked" onclick="bgTiled = this.checked">
-            <br/>
+            <label for="background-select">Background Select</label>
+            <select id="background-select" name="background-select"></select>
+            <br>
+            <div id="background-options" style="display: none">
+                <label for="bg-filename">Background Filename</label>
+                <input id="bg-filename" name="bg-filename" type="text" value="Grass.png" onload="backgroundFname = this.value" onchange="backgroundFname = this.value">
+                <br/>
+                <label for="bg-tiled">Tiled Background</label>
+                <input id="bg-tiled" name="bg-tiled" type="checkbox" checked onload="bgTiled = this.checked" onclick="bgTiled = this.checked">
+                <br/>
+            </div>
             <label for="dark-mode">Dark Mode</label>
             <input id="dark-mode" name="dark-mode" type="checkbox"
                    onclick="setDarkMode(this.checked); document.styleSheets[0].insertRule('* {transition: background-color 0.25s linear, border 0.25s linear}')">

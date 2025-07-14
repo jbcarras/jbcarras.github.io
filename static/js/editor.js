@@ -33,6 +33,8 @@ let level = document.getElementById("level")
 
 let types = {}
 
+let globalBackgrounds = {}
+
 let backgroundFname = "Grass.png"
 let bgTiled= true
 
@@ -97,8 +99,41 @@ function initEditor() {
             initTypes(data["types"])
             initItems(data["items"])
             resetLevel()
+            initBackgrounds(data["backgrounds"])
         renderToolbar()
         })
+}
+
+function initBackgrounds(backgrounds) {
+    let selector = document.getElementById("background-select")
+    for (let background of backgrounds) {
+        let select = document.createElement("option")
+        select.value = background["filename"]
+        select.textContent = background["filename"]
+        globalBackgrounds[background["filename"]] = background["tiled"]
+        selector.append(select)
+    }
+    let custom = document.createElement("option")
+    custom.value = "Custom"
+    custom.textContent = "Custom"
+    selector.append(custom)
+    selector.children[0].selected = true
+    selector.addEventListener("change", (event) => {
+        changeBackground(event.target.value)
+    })
+    changeBackground(selector.children[0].value)
+}
+
+function changeBackground(to) {
+    if (to === "Custom") {
+        document.getElementById("background-options").style.display = "block"
+        document.getElementById("level").style.backgroundImage = "url('static/tiles/Grass.png')"
+    } else {
+        document.getElementById("background-options").style.display = "none"
+        document.getElementById("bg-filename").value = to
+        document.getElementById("bg-tiled").checked = globalBackgrounds[to]
+        document.getElementById("level").style.backgroundImage = `url('static/tiles/${to}')`
+    }
 }
 
 function initTasks(tasks) {
@@ -416,8 +451,11 @@ function resetLevel() {
     })
     document.getElementById("level-container").prepend(nlevel)
     level = nlevel
+    changeBackground(document.getElementById("background-select").value)
     board = Array(Number(document.getElementById("height").value)).fill("").map(() => Array(Number(document.getElementById("width").value)).fill(""))
 }
+
+let stu = ""
 
 function importLevel(file) {
     const reader = new FileReader()
@@ -446,8 +484,16 @@ function importLevel(file) {
             let height = lvl[1].split(',')[2]
             board[height][width] = `,Player,${width},${height}`
         }
-        document.getElementById("bg-filename").value = lvl[2].split(',')[1]
+        let bgFilename = lvl[2].split(',')[1].replace("\n","")
+        document.getElementById("bg-filename").value = bgFilename
         document.getElementById("bg-tiled").checked = lvl[2].split(',')[0] === "BackgroundTile"
+        if (Object.keys(globalBackgrounds).includes(bgFilename)) {
+            document.getElementById("background-select").value = bgFilename
+        } else {
+            document.getElementById("background-select").value = "Custom"
+        }
+        document.getElementById("background-select").dispatchEvent(new Event("change"))
+
         for (let line of lvl.slice(3)) {
             if (line !== "") {
                 let width = line.split(',')[2]
@@ -496,7 +542,9 @@ function exportLevel() {
     }
     let lvlTypePrettyName = document.getElementById("type-name").value
 
-    out = `${lvlTypePrettyName},${lvlName},${board[0].length},${board.length}\nPlayerStartLocation,${startLocation[0]},${startLocation[1]}\n${bgTiled ? "BackgroundTile" : "BackgroundImage"},${backgroundFname}\n` + out
+    let bgName = document.getElementById("bg-filename").value
+
+    out = `${lvlTypePrettyName},${lvlName},${board[0].length},${board.length}\nPlayerStartLocation,${startLocation[0]},${startLocation[1]}\n${bgTiled ? "BackgroundTile" : "BackgroundImage"},${bgName}\n` + out
     const link = document.createElement("a")
     const file = new Blob([out], {type: "text/plain"})
     link.href = URL.createObjectURL(file)

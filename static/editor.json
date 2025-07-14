@@ -1,6 +1,7 @@
 {
   "tasks": ["Task 1", "Task 2", "Task 3", "Task 4", "Task 5", "Task 6", "Bonus", "Mario"],
   "types": {"topdown": "TopDownLevel", "platformer": "PlatformerLevel", "openworld": "OpenWorldLevel", "sidescroller":  "SideScrollerLevel"},
+  "backgrounds": [{"filename": "Grass.png", "tiled": true},{"filename": "Sky.png", "tiled": true}],
   "items": {
     "Wall": {
       "description": "A wall for top-down levels.",

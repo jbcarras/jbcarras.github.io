@@ -121,7 +121,6 @@ select {
 }
 #level {
     margin: auto;
-    background-image: url('../tiles/Sky.png');
     background-size: 10.0vh;
     background-clip: content-box;
     padding: 8vh;
