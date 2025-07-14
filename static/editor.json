@@ -1,10 +1,8 @@
 {
   "tasks": ["Task 1", "Task 2", "Task 3", "Task 4", "Task 5", "Task 6", "Bonus", "Mario"],
   "types": {"topdown": "TopDownLevel", "platformer": "PlatformerLevel", "openworld": "OpenWorldLevel", "sidescroller":  "SideScrollerLevel"},
-  "backgrounds": [{"url": "Grass.png", "tiled": true, "location": []},{}],
   "items": {
     "Wall": {
-      "name": "Wall",
       "description": "A wall for top-down levels.",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -13,7 +11,6 @@
       "allowedTypes": ["topdown", "openworld"]
     },
     "PlatformerWall": {
-      "name": "PlatformerWall",
       "description": "A wall for platformer levels. Accounts for gravity.",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -22,7 +19,6 @@
       "allowedTypes": ["platformer","sidescroller"]
     },
     "Demon": {
-      "name": "Demon",
       "description": "Harms the player. May be able to move.",
       "parent": "DynamicGameObject",
       "attributes": [
@@ -34,7 +30,6 @@
       "allowedTypes": ["topdown", "openworld"]
     },
     "AxePickup": {
-      "name": "AxePickup",
       "description": "A slow-moving but strong projectile.",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -43,7 +38,6 @@
       "allowedTypes": ["topdown", "openworld"]
     },
     "Goal": {
-      "name": "Goal",
       "description": "Calls advanceLevel() when a Player collides.",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -52,7 +46,6 @@
       "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
     },
     "Potion": {
-      "name": "Potion",
       "description": "A potion that heals players who come in contact.",
       "parent": "StaticGameObject",
       "attributes": [
@@ -63,7 +56,6 @@
       "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
     },
     "PotionPickup": {
-      "name": "PotionPickup",
       "description": "A potion that gets stored in a player's inventory to be consumed later.",
       "parent": "StaticGameObject",
       "attributes": [
@@ -74,7 +66,6 @@
       "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
     },
     "Tower": {
-      "name": "Tower",
       "description": "An indestructible and immobile enemy tower.",
       "parent": "DynamicGameObject",
       "attributes": [],
@@ -83,7 +74,6 @@
       "allowedTypes": ["topdown", "openworld"]
     },
     "MagicPickup": {
-      "name": "MagicPickup",
       "description": "A fast but weaker projectile.",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -92,7 +82,6 @@
       "allowedTypes": ["topdown", "openworld"]
     },
     "Spike": {
-      "name": "Spike",
       "description": "A fatal obstacle.",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -101,7 +90,6 @@
       "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
     },
     "SmartEnemy": {
-      "name": "SmartEnemy",
       "description": "A smarter enemy that hunts the player down, avoiding walls.",
       "parent": "DynamicGameObject",
       "attributes": [
@@ -113,7 +101,6 @@
       "allowedTypes": ["topdown", "openworld"]
     },
     "Archer": {
-      "name": "Archer",
       "description": "An enemy who fires harmful arrows at the player.",
       "parent": "DynamicGameObject",
       "attributes": [
@@ -124,7 +111,6 @@
       "allowedTypes": ["topdown", "openworld"]
     },
     "PushWall": {
-      "name": "PushWall",
       "description": "A wall that gets pushed when collided with.",
       "parent": "DynamicGameObject",
       "attributes": [],
@@ -133,7 +119,6 @@
       "allowedTypes": ["topdown","openworld"]
     },
     "Platform": {
-      "name": "Platform",
       "description": "A platform that can be jumped through.",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -142,16 +127,19 @@
       "allowedTypes": ["platformer","sidescroller"]
     },
     "Ledge": {
-      "name": "Ledge",
       "description": "A barrier that can be walked through from above, but not below.",
       "parent": "StaticGameObject",
       "attributes": [],
+      "alternatives": [
+        {"displayName": "Bottom Middle", "url": "Ledge.png", "value": "middle"},
+        {"displayName": "Bottom Left", "url": "Ledge-BL.png", "value": "left"},
+        {"displayName": "Bottom Right", "url": "Ledge-BR.png","value": "right"}
+      ],
       "url": "Ledge.png",
       "task": 7,
       "allowedTypes": ["topdown","openworld"]
     },
     "InfoNode": {
-      "name": "InfoNode",
       "description": "An interactable object that displays text.",
       "parent": "StaticGameObject",
       "attributes": [
@@ -162,7 +150,6 @@
       "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
     },
     "Horse": {
-      "name": "Horse",
       "description": "Immovable horse of destruction.",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -171,7 +158,6 @@
       "allowedTypes": ["topdown", "openworld"]
     },
     "QuestionBlock": {
-      "name": "QuestionBlock",
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -180,7 +166,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "Block": {
-      "name": "Block",
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -189,7 +174,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "UpPipeLeft": {
-      "name": "UpPipeLeft",
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -198,7 +182,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "UpPipeRight": {
-      "name": "UpPipeRight",
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -207,7 +190,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "UpPipeTopLeft": {
-      "name": "UpPipeTopLeft",
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -216,7 +198,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "UpPipeTopRight": {
-      "name": "UpPipeTopRight",
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -225,7 +206,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "HiddenBlock": {
-      "name": "HiddenBlock",
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -234,7 +214,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "Bricks": {
-      "name": "Bricks",
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -243,7 +222,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "Ground": {
-      "name": "Ground",
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -252,7 +230,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "Flag": {
-      "name": "Flag",
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -261,7 +238,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "Flagpole": {
-      "name": "Flagpole",
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -270,7 +246,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "FlagTip": {
-      "name": "FlagTip",
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -279,7 +254,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "FlagTop": {
-      "name": "FlagTop",
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
@@ -288,7 +262,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "Goomba": {
-      "name": "Goomba",
       "description": "",
       "parent": "DynamicGameObject",
       "attributes": [],
@@ -297,7 +270,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "Turtle": {
-      "name": "Turtle",
       "description": "",
       "parent": "DynamicGameObject",
       "attributes": [],
@@ -306,7 +278,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "BuzzyBeetle": {
-      "name": "BuzzyBeetle",
       "description": "",
       "parent": "DynamicGameObject",
       "attributes": [],
@@ -315,7 +286,6 @@
       "allowedTypes": ["sidescroller"]
     },
     "Mario": {
-      "name": "Mario",
       "description": "",
       "parent": "DynamicGameObject",
       "attributes": [],

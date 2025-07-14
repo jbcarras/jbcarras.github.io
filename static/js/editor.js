@@ -1,5 +1,5 @@
 class Item {
-    constructor(name, description, parent, attributes, url, task, allowedTypes) {
+    constructor(name, description, parent, attributes, url, task, allowedTypes, alternatives=[]) {
         this.name = name
         this.description = description
         this.parent = parent
@@ -7,6 +7,10 @@ class Item {
         this.url = `static/tiles/${url}`
         this.task = Number(task)
         this.allowedTypes = allowedTypes
+        this.alternatives = alternatives
+
+        alternatives.forEach((item) => {item.url = `static/tiles/${item.url}`})
+
     }
 }
 
@@ -112,9 +116,15 @@ function initTypes(loadedTypes) {
 function initItems(loadedItems) {
     items = loadedItems
     for ([item, itemEntry] of Object.entries(loadedItems)) {
-        items[item] = new Item(itemEntry["name"], itemEntry["description"],
+        if ("alternatives" in itemEntry) {
+            items[item] = new Item(item, itemEntry["description"],
+            itemEntry["parent"], itemEntry["attributes"], itemEntry["url"],
+            itemEntry["task"], itemEntry["allowedTypes"], itemEntry["alternatives"])
+        } else {
+            items[item] = new Item(item, itemEntry["description"],
             itemEntry["parent"], itemEntry["attributes"], itemEntry["url"],
             itemEntry["task"], itemEntry["allowedTypes"])
+        }
     }
     toolbarLookup = {...tools, ...items}
 }
@@ -190,6 +200,24 @@ function renderAttributes() {
         input.className = "attribute"
         attributes.append(label, input, document.createElement("br"))
     })
+
+    if (toolbarLookup[activeItem].alternatives.length !== 0) {
+        let label = document.createElement("label")
+        let select = document.createElement("select")
+        label.for = "alternatives"
+        label.textContent = "Sprite"
+        toolbarLookup[activeItem].alternatives.forEach((item) => {
+            let option = document.createElement("option")
+            option.value = item.value
+            option.name = item.displayName
+            option.textContent = item.displayName
+            select.append(option)
+            select.className = "attribute"
+            select.id = "alternatives-select"
+        })
+        attributes.append(label, select, document.createElement("br"))
+    }
+
     attributesSec.append(attributes)
 }
 
@@ -255,7 +283,14 @@ function drawEvent(event) {
         if (Object.keys(tools).includes(activeItem)) {
             toolHandler(event)
         }
-        event.target.style.backgroundImage = "url(" + toolbarLookup[activeItem].url + ")"
+        if (toolbarLookup[activeItem].alternatives.length !== 0) {
+            let alternative = toolbarLookup[activeItem].alternatives.find((item) => {
+                return item.value === document.getElementById("alternatives-select").value
+            })
+            event.target.style.backgroundImage = "url(" + alternative.url + ")"
+        } else {
+            event.target.style.backgroundImage = "url(" + toolbarLookup[activeItem].url + ")"
+        }
         event.target.textContent = toolbarLookup[activeItem]
         event.target.dataset.type = "tile"
         let attributes = document.getElementsByClassName("attribute").length !== 0 ? "," + Array.from(document.getElementsByClassName("attribute")).map((element) => element.value).reduce((a, b) => a + "," + b) : ""
@@ -314,9 +349,11 @@ function importLevel(file) {
         document.getElementById("width").value = lvl[0].split(',')[2]
         document.getElementById("height").value = lvl[0].split(',')[3]
         resetLevel()
-        let width = lvl[1].split(',')[1]
-        let height = lvl[1].split(',')[2]
-        board[height][width] = `,Player,${width},${height}`
+        if (lvl[1].split(',')[1] !== "undefined" && lvl[1].split(',')[2] !== "undefined") {
+            let width = lvl[1].split(',')[1]
+            let height = lvl[1].split(',')[2]
+            board[height][width] = `,Player,${width},${height}`
+        }
         document.getElementById("bg-filename").value = lvl[2].split(',')[1]
         document.getElementById("bg-tiled").checked = lvl[2].split(',')[0] === "BackgroundTile"
         for (let line of lvl.slice(3)) {
@@ -330,7 +367,17 @@ function importLevel(file) {
             for (let x = 0; x < board[y].length; x++) {
                 if (board[y][x] !== "") {
                     const div = document.getElementById("level").children[y].children[x]
-                    div.style.backgroundImage = `url(${toolbarLookup[board[y][x].split(',')[1]].url})`
+                    let item = toolbarLookup[board[y][x].split(',')[1]]
+                    if (item.alternatives.length !== 0) {
+                        let alternative = item.alternatives.find((item) => {
+                            let entry = board[y][x].split(',')
+                            return item.value === entry[entry.length-1].replace("\n", "")
+                        })
+                        console.log(alternative.url)
+                        div.style.backgroundImage = `url(${alternative.url})`
+                    } else (
+                        div.style.backgroundImage = `url(${item.url})`
+                    )
                     div.textContent = board[y][x].split(',')[1]
                 }
             }
