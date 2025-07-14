@@ -8,7 +8,9 @@ class Item {
         this.task = Number(task)
         this.allowedTypes = allowedTypes
         this.alternatives = alternatives
+        this.custom = false
 
+        this.allowedTypes.push("custom")
         alternatives.forEach((item) => {item.url = `static/tiles/${item.url}`})
 
     }
@@ -17,6 +19,7 @@ class Item {
 const tools = {
     "Eraser": new Item("Eraser", "Erase tiles you previously drew.", "", [], "Eraser.png", 0, ["topdown", "platformer"]),
     "Player": new Item("Player", "Where the player appears when the level is loaded.", "", [], "Player.png", 0, ["topdown", "platformer"]),
+    "Custom": new Item("Custom", "Create custom tiles.", "", [{"name": "Parent", "defaultVal": "", "inputType": "text"},{"name": "Name", "defaultVal": "", "inputType": "text"},{"name":"Toolbar","defaultVal":"Add to Toolbar","inputType":"button"},{"name":"Export Custom","defaultVal":"Export Custom Items","inputType":"button"},{"name":"Import Custom","defaultVal":"Import Custom Items","inputType":"button"}], "Custom.png", 0, ["topdown", "platformer"])
 }
 
 let toolbarLookup = {...tools}
@@ -38,6 +41,8 @@ let type = ""
 let task = 0
 let board = []
 
+let customConfig = {}
+
 initEditor()
 
 if (localStorage.getItem("theme") === "dark") {
@@ -51,6 +56,7 @@ if (localStorage.getItem("theme") === "dark") {
 function initEditor() {
     document.getElementById("eraser-button").addEventListener("click", (event) => {setActiveItem(event)})
     document.getElementById("player-button").addEventListener("click", (event) => setActiveItem(event))
+    document.getElementById("custom-button").addEventListener("click", (event) => setActiveItem(event))
     const reset = document.getElementById("reset")
     reset.addEventListener("click", resetLevel)
 
@@ -74,6 +80,13 @@ function initEditor() {
         if (activeItem === "" || !toolbarLookup[activeItem].allowedTypes.includes(type)) {
             activeItem = ""
         }
+        if (type === "custom") {
+            document.getElementById("custom-type-container").style.display = "block"
+        } else {
+            document.getElementById("custom-type-container").style.display = "none"
+            document.getElementById("type-name").value = types[type]
+        }
+
         renderAttributes()
     })
     fetch("static/editor.json").then(
@@ -109,7 +122,12 @@ function initTypes(loadedTypes) {
         type.textContent = prettyName
         dropdown.append(type)
     }
+    let opt = document.createElement("option")
+        opt.value = "custom"
+        opt.textContent = "Custom"
+        dropdown.append(opt)
     type = dropdown.children[0].value
+    document.getElementById("type-name").value = types[type]
     dropdown.children[0].selected = true
 }
 
@@ -144,7 +162,7 @@ function renderToolbar() {
         const toolbarItem = document.createElement("div")
         toolbarItem.className = "toolbar-item"
         toolbarItem.textContent = itemInstance.name
-        toolbarItem.style.backgroundImage = "url(" + itemInstance.url + ")"
+        toolbarItem.style.backgroundImage = `url(${itemInstance.url})`
         toolbarItem.dataset.type = "tb-tile"
 
         toolbarItem.addEventListener("click", setActiveItem)
@@ -173,6 +191,12 @@ function renderAttributes() {
     heading.textContent = toolbarLookup[activeItem].name
     description.textContent = toolbarLookup[activeItem].description
     attributesSec.append(heading, description)
+    if (activeItem === "Custom") {
+        document.getElementById("customizer").style.display = "block"
+        return
+    } else {
+        document.getElementById("customizer").style.display = "none"
+    }
     toolbarLookup[activeItem].attributes.forEach((item) => {
         let label = document.createElement("label")
         let input = document.createElement("input")
@@ -182,10 +206,11 @@ function renderAttributes() {
         input.name = item.name
         input.type = item.inputType
         input.value = item.defaultVal
-        const legal = /[a-z]|[0-9]|[\s!@#$%^&*()\-_+=.?~`]/i;
+
         input.oninput = (item) => {
+            let legal = /[a-z]|[0-9]|[\s!@#$%^&*()\-_+=.?~`]/i
             item.target.value = Array.from(item.target.value).filter((character) => {
-                return legal.test(character)
+                    return legal.test(character)
             }).join('')
         }
         if (item.inputType !== "text") {
@@ -197,8 +222,10 @@ function renderAttributes() {
                 backgroundFname = event.target.value
             })
         }
+
         input.className = "attribute"
-        attributes.append(label, input, document.createElement("br"))
+
+      attributes.append(label, document.createElement("br"), input, document.createElement("br"))
     })
 
     if (toolbarLookup[activeItem].alternatives.length !== 0) {
@@ -221,6 +248,36 @@ function renderAttributes() {
     attributesSec.append(attributes)
 }
 
+function customizerAdd() {
+    let name = document.getElementById("custom-name").value
+    let parent = document.getElementById("custom-parent").value
+    if (name === "" || parent === "") {
+        return
+    }
+    addCustomItem(name, parent)
+}
+
+function addCustomItem(name, parent) {
+    let item = new Item(
+        name,
+        "",
+        parent,
+        [
+        {
+        "name": "Attributes",
+        "defaultVal": "",
+        "inputType": "text"
+        }],
+        "", 0, Object.keys(types)
+    )
+    item.url = "\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='80px' width='80px'><rect x='0' y='0' width='500px' height='500px' fill='darkgray'></rect><text x='0' y='40' fill='white' font-size='20' font-family='sans-serif' font-weight='bold'>"+name+"</text></svg>\""
+    item.custom = true
+    toolbarLookup[name] = item
+    items[name] = item
+    customConfig[name] = item
+    renderToolbar()
+}
+
 function setActiveItem(event) {
     let item = event.currentTarget
     if (document.getElementById("selector") != null) {
@@ -239,9 +296,33 @@ function setTiledBackground(to) {
 
 }
 
+function exportCustom() {
+    let lvlName = document.getElementById("name").value === "" ? "level" : document.getElementById("name").value
+    let filename = lvlName + "-config.json"
+    const json = JSON.stringify(customConfig, null, 4)
+    const file = new Blob([json], {type: "application/json"})
+    const link = document.createElement("a")
+    link.href = URL.createObjectURL(file)
+    link.download = filename
+    link.click()
+    URL.revokeObjectURL(link.href)
+}
+
+function importCustom(file) {
+    const reader = new FileReader()
+    reader.readAsText(file)
+    reader.onload = () => {
+        let json = JSON.parse(reader.result.toString())
+        customConfig = {...customConfig, ...json}
+        toolbarLookup = {...toolbarLookup, ...json}
+        items = {...items, ...json}
+        renderToolbar()
+    }
+}
+
 function mouseDownEvent(event) {
     event.preventDefault();
-    if (activeItem === "") {
+    if (activeItem === "" || activeItem === "Custom") {
         return
     }
     if (activeItem === "Eraser") {
@@ -291,9 +372,9 @@ function drawEvent(event) {
         } else {
             event.target.style.backgroundImage = "url(" + toolbarLookup[activeItem].url + ")"
         }
-        event.target.textContent = toolbarLookup[activeItem]
+        event.target.textContent = toolbarLookup[activeItem].name
         event.target.dataset.type = "tile"
-        let attributes = document.getElementsByClassName("attribute").length !== 0 ? "," + Array.from(document.getElementsByClassName("attribute")).map((element) => element.value).reduce((a, b) => a + "," + b) : ""
+        const attributes = document.getElementsByClassName("attribute").length !== 0 && !(toolbarLookup[activeItem].custom && document.getElementById("Attributes").value.length === 0) ? "," + Array.from(document.getElementsByClassName("attribute")).map((element) => element.value).reduce((a, b) => a + "," + b) : ""
         board[Number(event.target.dataset.y)][Number(event.target.dataset.x)] = toolbarLookup[activeItem].parent + "," + toolbarLookup[activeItem].name + "," + event.target.dataset.x + "," + event.target.dataset.y + attributes + "\n"
     }
     level.addEventListener("mouseup", () => {
@@ -344,7 +425,18 @@ function importLevel(file) {
     reader.onload = () => {
         const lvl = reader.result.split("\n")
         const typeSelect = document.getElementById("type")
-        typeSelect.value = Object.keys(types).find((type) => {return types[type] === lvl[0].split(',')[0]})
+        const selType = Object.keys(types).find((type) => {return types[type] === lvl[0].split(',')[0]})
+        if (selType !== undefined) {
+            typeSelect.value = selType
+            type = selType
+            document.getElementById("custom-type-container").style.display = "none"
+            document.getElementById("type-name").value = types[selType]
+        } else {
+            typeSelect.value = "custom"
+            type = "custom"
+            document.getElementById("custom-type-container").style.display = "block"
+            document.getElementById("type-name").value = lvl[0].split(',')[0]
+        }
         document.getElementById("name").value = lvl[0].split(',')[1]
         document.getElementById("width").value = lvl[0].split(',')[2]
         document.getElementById("height").value = lvl[0].split(',')[3]
@@ -367,21 +459,25 @@ function importLevel(file) {
             for (let x = 0; x < board[y].length; x++) {
                 if (board[y][x] !== "") {
                     const div = document.getElementById("level").children[y].children[x]
-                    let item = toolbarLookup[board[y][x].split(',')[1]]
-                    if (item.alternatives.length !== 0) {
+                    if (!(board[y][x].split(',')[1] in toolbarLookup)) {
+                        addCustomItem(board[y][x].split(',')[1], board[y][x].split(',')[0])
+                        div.style.backgroundImage = `url(${items[board[y][x].split(',')[1]].url})`
+                    } else {
+                        let item = toolbarLookup[board[y][x].split(',')[1]]
+                        if (item.alternatives.length !== 0) {
                         let alternative = item.alternatives.find((item) => {
                             let entry = board[y][x].split(',')
                             return item.value === entry[entry.length-1].replace("\n", "")
                         })
-                        console.log(alternative.url)
                         div.style.backgroundImage = `url(${alternative.url})`
-                    } else (
-                        div.style.backgroundImage = `url(${item.url})`
-                    )
-                    div.textContent = board[y][x].split(',')[1]
+                        } else (
+                            div.style.backgroundImage = `url(${item.url})`
+                        )
+                    }
                 }
             }
         }
+        renderToolbar()
     }
 }
 
@@ -398,7 +494,7 @@ function exportLevel() {
             }
         }
     }
-    let lvlTypePrettyName = Object.keys(types).includes(type) ? types[type] : "MissingType"
+    let lvlTypePrettyName = document.getElementById("type-name").value
 
     out = `${lvlTypePrettyName},${lvlName},${board[0].length},${board.length}\nPlayerStartLocation,${startLocation[0]},${startLocation[1]}\n${bgTiled ? "BackgroundTile" : "BackgroundImage"},${backgroundFname}\n` + out
     const link = document.createElement("a")

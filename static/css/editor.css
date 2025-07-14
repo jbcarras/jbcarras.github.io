@@ -70,7 +70,7 @@ select {
     overflow-y: scroll;
     overflow-x: hidden;
 }
-#attributes-section {
+#item-info-container {
     min-height: 25%;
 }
 #level-container {

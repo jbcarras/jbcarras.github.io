@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="static/css/editor.css"}>
+    <link rel="stylesheet" href="../GameEngine-LevelEditor/static/css/editor.css"}>
     <link rel="stylesheet" id="dark-mode-style" href="static/css/dark.css" disabled>
     <link rel="shortcut icon" href="static/favicon.ico">
     <script src="static/js/editor.js" defer></script>
@@ -53,11 +53,32 @@
                    onclick="setDarkMode(this.checked); document.styleSheets[0].insertRule('* {transition: background-color 0.25s linear, border 0.25s linear}')">
             <hr/>
         </div>
-        <div id="attributes-section">
+        <div id="item-info-container">
+            <div id="attributes-section">
             <h2>Level Editor</h2>
             <p class="center">Click on a tile to start drawing it.</p>
             <p class="center">Left Click - Draw</p>
             <p class="center">Right Click - Erase</p>
+        </div>
+            <div id="customizer" style="display: none">
+                <label for="custom-parent">Parent</label>
+                <br>
+                <input id="custom-parent" name="Parent" type="text" class="attribute">
+                <br>
+                <label for="custom-name">Name</label>
+                <br>
+                <input id="custom-name" name="Name" type="text" class="attribute">
+                <br>
+                <input id="custom-toolbar-add" name="Toolbar" type="button" value="Add to Toolbar" size="5" class="attribute" onclick="customizerAdd()">
+                <br>
+                <input id="export-custom" name="export-custom" type="button" onclick="exportCustom()" value="Export Custom Items" size="5" class="attribute">
+                <br>
+                <label for="import-custom-file" style="display: none">Import Custom Items</label>
+                <input id="import-custom-file" name="import-custom-file" type="file" accept="application/json" style="display: none"
+                   onchange="importCustom(this.files[this.files.length - 1])">
+                <input id="import-custom" onclick="document.getElementById('import-custom-file').click()" name="import-custom" type="button" value="Import Custom Items" size="5" class="attribute">
+                <br>
+            </div>
         </div>
         <br/>
         <hr/>
@@ -68,10 +89,16 @@
                 <br/>
                 <label for="type">Level Type</label>
                 <select id="type" name="type"></select>
+                <div id="custom-type-container" style="display: none">
+                    <label for="type-name">Custom Type</label>
+                    <input id="type-name" name="type-name" type="text">
+                </div>
+
             </div>
             <div id="toolbar">
                 <div class="toolbar-item" id="eraser-button" data-type="tool" style="background-image: url('static/tiles/Eraser.png')">Eraser</div>
                 <div class="toolbar-item" id="player-button" data-type="tool" style="background-image: url('static/tiles/Player.png')">Player</div>
+                <div class="toolbar-item" id="custom-button" data-type="tool" style="background-image: url('static/tiles/Custom.png')">Custom</div>
                 <hr/>
             </div>
         </div>
