@@ -305,7 +305,7 @@ function addCustomItem(name, parent) {
         }],
         "", 0, Object.keys(types)
     )
-    item.url = "\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='80px' width='80px'><rect x='0' y='0' width='500px' height='500px' fill='darkgray'></rect><text x='0' y='40' fill='white' font-size='20' font-family='sans-serif' font-weight='bold'>"+name+"</text></svg>\""
+    item.url = `\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='80px' width='80px'><rect x='0' y='0' width='500px' height='500px' fill='${encodeURIComponent(document.getElementById("custom-color").value)}'></rect><text x='0' y='40' fill='white' font-size='20' font-family='sans-serif' font-weight='bold'>${name}</text></svg>\"`
     item.custom = true
     toolbarLookup[name] = item
     items[name] = item
