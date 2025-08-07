@@ -35,11 +35,11 @@
             <input id="height" name="height" type="number" value="8" min="0" size="3"
                    oninput="this.value = Math.max(this.value, 0)">
             <br/>
-            <button id="export">Export</button>
+            <button id="export">Export Level</button>
             <label for="level-import" style="display: none">Import from CSV</label>
             <input id="level-import" name="level-import" type="file" accept="text/csv" style="display: none"
                    onchange="importLevel(this.files[this.files.length - 1])">
-            <button onclick="document.getElementById('level-import').click()">Import</button>
+            <button onclick="document.getElementById('level-import').click()">Import Level</button>
             <button id="reset">Reset</button>
             <br/>
             <label for="background-select">Background Select</label>
@@ -55,7 +55,7 @@
             </div>
             <label for="dark-mode">Dark Mode</label>
             <input id="dark-mode" name="dark-mode" type="checkbox"
-                   onclick="setDarkMode(this.checked); document.styleSheets[0].insertRule('* {transition: background-color 0.25s linear, border 0.25s linear}')">
+                   onclick="setDarkMode(this.checked); document.styleSheets[0].insertRule('* {transition: background-color 0.25s linear, border 0.25s linear, box-shadow 0.25s linear}')">
             <hr/>
         </div>
         <div id="item-info-container">
@@ -65,6 +65,15 @@
             <p class="center">Left Click - Draw</p>
             <p class="center">Right Click - Erase</p>
         </div>
+            <div id="player-info" style="display: none">
+                <h3>Manual Override</h3>
+                <label for="player-x">Player X-Coordinate</label>
+                <input type="number" value="" id="player-x" size="3" name="player-x" autocomplete="off" onchange="this.value = Math.max(this.value, 0); setPlayerLocation(this.value, document.getElementById('player-y').value);">
+                <br/>
+                <label for="player-y">Player Y-Coordinate</label>
+                <input type="number" value="" id="player-y" size="3" name="player-y" autocomplete="off" onchange="this.value = Math.max(this.value, 0); setPlayerLocation(document.getElementById('player-x').value, this.value)">
+                <p>Note: Player will not appear in the preview if you manually input the start location here.</p>
+            </div>
             <div id="customizer" style="display: none">
                 <label for="custom-parent">Parent</label>
                 <br>
@@ -75,16 +84,16 @@
                 <input id="custom-name" name="Name" type="text" class="attribute">
                 <br>
                 <label for="custom-color">Color</label>
-                <input id="custom-color" name="custom-color" type="color" class="attribute" value="#A9A9A9">
+                <input id="custom-color" name="custom-color" type="color" class="attribute" value="#A9A9A9" style="cursor: pointer;">
                 <br/>
-                <input id="custom-toolbar-add" name="Toolbar" type="button" value="Add to Toolbar" size="5" class="attribute" onclick="customizerAdd()">
+                <button id="custom-toolbar-add" class="attribute" name="Toolbar" onclick="customizerAdd()">Add to Palette</button>
                 <br>
-                <input id="export-custom" name="export-custom" type="button" onclick="exportCustom()" value="Export Custom Items" size="5" class="attribute">
+                <button id="export-custom" name="export-custom" onclick="exportCustom()" class="attribute">Export Custom Items</button>
                 <br>
+                <button id="import-custom" name="import-custom" onclick="document.getElementById('import-custom-file').click()" class="attribute">Import Custom Items</button>
                 <label for="import-custom-file" style="display: none">Import Custom Items</label>
                 <input id="import-custom-file" name="import-custom-file" type="file" accept="application/json" style="display: none"
                    onchange="importCustom(this.files[this.files.length - 1])">
-                <input id="import-custom" onclick="document.getElementById('import-custom-file').click()" name="import-custom" type="button" value="Import Custom Items" size="5" class="attribute">
                 <br>
             </div>
         </div>
@@ -106,7 +115,7 @@
             <div id="toolbar">
                 <div class="toolbar-item" id="eraser-button" data-type="tool" style="background-image: url('static/tiles/Eraser.png')">Eraser</div>
                 <div class="toolbar-item" id="player-button" data-type="tool" style="background-image: url('static/tiles/Player.png')">Player</div>
-                <div class="toolbar-item" id="custom-button" data-type="tool" style="background-image: url('static/tiles/Custom.png')">Custom</div>
+                <div class="toolbar-item" id="custom-button" data-type="tool" style="background-image: url('static/tiles/Custom.png')">Customizer</div>
                 <hr/>
             </div>
         </div>

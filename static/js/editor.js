@@ -18,8 +18,8 @@ class Item {
 
 const tools = {
     "Eraser": new Item("Eraser", "Erase tiles you previously drew.", "", [], "Eraser.png", 0, ["topdown", "platformer"]),
-    "Player": new Item("Player", "Where the player appears when the level is loaded.", "", [], "Player.png", 0, ["topdown", "platformer"]),
-    "Custom": new Item("Custom", "Create custom tiles.", "", [{"name": "Parent", "defaultVal": "", "inputType": "text"},{"name": "Name", "defaultVal": "", "inputType": "text"},{"name":"Toolbar","defaultVal":"Add to Toolbar","inputType":"button"},{"name":"Export Custom","defaultVal":"Export Custom Items","inputType":"button"},{"name":"Import Custom","defaultVal":"Import Custom Items","inputType":"button"}], "Custom.png", 0, ["topdown", "platformer"])
+    "Player": new Item("Player", "Draw where the player appears when the level is loaded.", "", [], "Player.png", 0, ["topdown", "platformer"]),
+    "Customizer": new Item("Customizer", "Create and manage custom tiles.", "", [], "Custom.png", 0, ["topdown", "platformer"])
 }
 
 let toolbarLookup = {...tools}
@@ -36,16 +36,25 @@ let types = {}
 let globalBackgrounds = {}
 
 let backgroundFname = "Grass.png"
-let bgTiled= true
+let bgTiled= false
 
 let activeItem = ""
 let type = ""
 let task = 0
 let board = []
 
+let playerLocation = ["",""]
+
 let customConfig = {}
 
+const randomColors = ["#A9A9A9", "#813d9c", "#c01c28", "#1c71d8", "#2ec27e"]
+
 initEditor()
+
+document.getElementById("name").value = ""
+document.getElementById("width").value = 12
+document.getElementById("height").value = 8
+document.getElementById("zoom").value = 50
 
 if (localStorage.getItem("theme") === "dark") {
     setDarkMode(true)
@@ -117,6 +126,10 @@ function initBackgrounds(backgrounds) {
     custom.value = "Custom"
     custom.textContent = "Custom"
     selector.append(custom)
+    let lvlDefault = document.createElement("option")
+    lvlDefault.value = "Default"
+    lvlDefault.textContent = "Default"
+    selector.prepend(lvlDefault)
     selector.children[0].selected = true
     selector.addEventListener("change", (event) => {
         changeBackground(event.target.value)
@@ -125,13 +138,14 @@ function initBackgrounds(backgrounds) {
 }
 
 function changeBackground(to) {
-    if (to === "Custom") {
-        document.getElementById("background-options").style.display = "block"
+    if (to === "Custom" || to === "Default") {
+        document.getElementById("background-options").style.display = to === "Custom" ? "block" : "none"
         document.getElementById("level").style.backgroundImage = "url('static/tiles/Grass.png')"
     } else {
         document.getElementById("background-options").style.display = "none"
         document.getElementById("bg-filename").value = to
         document.getElementById("bg-tiled").checked = globalBackgrounds[to]
+        bgTiled = globalBackgrounds[to]
         document.getElementById("level").style.backgroundImage = `url('static/tiles/${to}')`
     }
 }
@@ -226,9 +240,14 @@ function renderAttributes() {
     heading.textContent = toolbarLookup[activeItem].name
     description.textContent = toolbarLookup[activeItem].description
     attributesSec.append(heading, description)
-    if (activeItem === "Custom") {
+    if (activeItem === "Player") {
+        document.getElementById("player-info").style.display = "block"
+    } else {
+        document.getElementById("player-info").style.display = "none"
+    }
+
+    if (activeItem === "Customizer") {
         document.getElementById("customizer").style.display = "block"
-        return
     } else {
         document.getElementById("customizer").style.display = "none"
     }
@@ -264,20 +283,45 @@ function renderAttributes() {
     })
 
     if (toolbarLookup[activeItem].alternatives.length !== 0) {
+        let tb = document.createElement("div")
+        tb.id = "sprite-toolbar"
         let label = document.createElement("label")
         let select = document.createElement("select")
-        label.for = "alternatives"
+        label.for = "alternatives-select"
         label.textContent = "Sprite"
+        select.disabled = true
         toolbarLookup[activeItem].alternatives.forEach((item) => {
+            let tile = document.createElement("div")
+            tile.style.backgroundImage = `url(${item.url})`
+            tile.className = "toolbar-item"
+            tile.textContent = item.displayName
+            tb.append(tile)
+            tile.addEventListener("click", () => {
+                document.getElementById("alternatives-select").value = item.value
+                if (document.getElementById("alternatives-selector") != null) {
+                    document.getElementById("alternatives-selector").remove()
+                }
+                let selector = document.createElement("div")
+                selector.id = "alternatives-selector"
+                tile.append(selector)
+            })
+
+            tb.append(tile)
+
+
             let option = document.createElement("option")
             option.value = item.value
             option.name = item.displayName
             option.textContent = item.displayName
             select.append(option)
             select.className = "attribute"
+            select.name = "alternatives-select"
             select.id = "alternatives-select"
         })
-        attributes.append(label, select, document.createElement("br"))
+        let selector = document.createElement("div")
+        selector.id = "alternatives-selector"
+        tb.children[0].append(selector)
+        attributes.append(label, select, tb, document.createElement("br"))
     }
 
     attributesSec.append(attributes)
@@ -289,10 +333,10 @@ function customizerAdd() {
     if (name === "" || parent === "") {
         return
     }
-    addCustomItem(name, parent)
+    addCustomItem(name, parent, document.getElementById("custom-color").value)
 }
 
-function addCustomItem(name, parent) {
+function addCustomItem(name, parent, color) {
     let item = new Item(
         name,
         "",
@@ -305,12 +349,25 @@ function addCustomItem(name, parent) {
         }],
         "", 0, Object.keys(types)
     )
-    item.url = `\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='80px' width='80px'><rect x='0' y='0' width='500px' height='500px' fill='${encodeURIComponent(document.getElementById("custom-color").value)}'></rect><text x='0' y='40' fill='white' font-size='20' font-family='sans-serif' font-weight='bold'>${name}</text></svg>\"`
+    item.url = `\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='80px' width='80px'><rect x='0' y='0' width='500px' height='500px' fill='${encodeURIComponent(color)}'></rect><text x='5' y='40' fill='white' font-size='20' font-family='sans-serif' font-weight='bold'>${name}</text></svg>\"`
     item.custom = true
     toolbarLookup[name] = item
     items[name] = item
     customConfig[name] = item
     renderToolbar()
+}
+
+function setPlayerLocation(x=playerLocation[0], y=playerLocation[1]) {
+    if (document.getElementById("player") != null) {
+        const prev = document.getElementById("player")
+        prev.id = ""
+        prev.style.removeProperty("background-image")
+        prev.textContent = " "
+        board[Number(prev.dataset.y)][Number(prev.dataset.x)] = ""
+    }
+    document.getElementById("player-x").value = x
+    document.getElementById("player-y").value = y
+    playerLocation = [x, y]
 }
 
 function setActiveItem(event) {
@@ -324,11 +381,6 @@ function setActiveItem(event) {
     item.append(selector)
     activeItem = toolbarLookup[item.textContent].name
     renderAttributes()
-}
-
-function setTiledBackground(to) {
-    bgTiled = to
-
 }
 
 function exportCustom() {
@@ -357,7 +409,7 @@ function importCustom(file) {
 
 function mouseDownEvent(event) {
     event.preventDefault();
-    if (activeItem === "" || activeItem === "Custom") {
+    if (activeItem === "" || activeItem === "Customizer") {
         return
     }
     if (activeItem === "Eraser") {
@@ -382,13 +434,7 @@ function toolHandler(event) {
             level.addEventListener("mouseover", eraseEvent)
             break
         case "Player":
-            if (document.getElementById("player") != null) {
-                const prev = document.getElementById("player")
-                prev.id = ""
-                prev.style.removeProperty("background-image")
-                prev.textContent = " "
-                board[Number(prev.dataset.y)][Number(prev.dataset.x)] = ""
-            }
+            setPlayerLocation(event.target.dataset.x, event.target.dataset.y)
             event.target.id = "player"
             break
     }
@@ -453,6 +499,7 @@ function resetLevel() {
     level = nlevel
     changeBackground(document.getElementById("background-select").value)
     board = Array(Number(document.getElementById("height").value)).fill("").map(() => Array(Number(document.getElementById("width").value)).fill(""))
+    setPlayerLocation("", "")
 }
 
 let stu = ""
@@ -479,22 +526,33 @@ function importLevel(file) {
         document.getElementById("width").value = lvl[0].split(',')[2]
         document.getElementById("height").value = lvl[0].split(',')[3]
         resetLevel()
-        if (lvl[1].split(',')[1] !== "undefined" && lvl[1].split(',')[2] !== "undefined") {
-            let width = lvl[1].split(',')[1]
-            let height = lvl[1].split(',')[2]
-            board[height][width] = `,Player,${width},${height}`
-        }
-        let bgFilename = lvl[2].split(',')[1].replace("\n","")
-        document.getElementById("bg-filename").value = bgFilename
-        document.getElementById("bg-tiled").checked = lvl[2].split(',')[0] === "BackgroundTile"
-        if (Object.keys(globalBackgrounds).includes(bgFilename)) {
-            document.getElementById("background-select").value = bgFilename
-        } else {
-            document.getElementById("background-select").value = "Custom"
-        }
-        document.getElementById("background-select").dispatchEvent(new Event("change"))
+        let width = lvl[1].split(',')[1]
+        let height = lvl[1].split(',')[2]
+        setPlayerLocation(width, height)
 
-        for (let line of lvl.slice(3)) {
+        if (lvl[1].split(',')[1] !== "" && lvl[1].split(',')[2] !== "") {
+            if (Number(width) === Math.floor(Number(width)) && Number(height) === Math.floor(Number(height))) {
+                board[height][width] = `,Player,${width},${height}`
+            }
+        }
+        let contentStart = 3
+        if (lvl[2].split(',')[0] !== "BackgroundTile" && lvl[2].split(',')[0] !== "BackgroundImage") {
+            document.getElementById("background-select").value = "Default"
+            document.getElementById("background-select").dispatchEvent(new Event("change"))
+            contentStart = 2
+        } else {
+            let bgFilename = lvl[2].split(',')[1].replace("\n","")
+            document.getElementById("bg-filename").value = bgFilename
+            document.getElementById("bg-tiled").checked = lvl[2].split(',')[0] === "BackgroundTile"
+            if (Object.keys(globalBackgrounds).includes(bgFilename)) {
+                document.getElementById("background-select").value = bgFilename
+            } else {
+                document.getElementById("background-select").value = "Custom"
+            }
+            document.getElementById("background-select").dispatchEvent(new Event("change"))
+        }
+
+        for (let line of lvl.slice(contentStart)) {
             if (line !== "") {
                 let width = line.split(',')[2]
                 let height = line.split(',')[3]
@@ -506,7 +564,7 @@ function importLevel(file) {
                 if (board[y][x] !== "") {
                     const div = document.getElementById("level").children[y].children[x]
                     if (!(board[y][x].split(',')[1] in toolbarLookup)) {
-                        addCustomItem(board[y][x].split(',')[1], board[y][x].split(',')[0])
+                        addCustomItem(board[y][x].split(',')[1], board[y][x].split(',')[0], randomColors[Math.floor(Math.random() * randomColors.length)])
                         div.style.backgroundImage = `url(${items[board[y][x].split(',')[1]].url})`
                     } else {
                         let item = toolbarLookup[board[y][x].split(',')[1]]
@@ -530,12 +588,10 @@ function importLevel(file) {
 function exportLevel() {
     let lvlName = document.getElementById("name").value === "" ? "level" : document.getElementById("name").value
     let out = ""
-    let startLocation = []
+    let startLocation = playerLocation
     for (let y = 0; y < board.length; y++) {
         for (let x = 0; x < board[y].length; x++) {
-            if (board[y][x].split(",")[1] === "Player") {
-                startLocation = [x, y]
-            } else {
+            if (board[y][x].split(",")[1] !== "Player") {
                 out += board[y][x]
             }
         }
@@ -544,7 +600,15 @@ function exportLevel() {
 
     let bgName = document.getElementById("bg-filename").value
 
-    out = `${lvlTypePrettyName},${lvlName},${board[0].length},${board.length}\nPlayerStartLocation,${startLocation[0]},${startLocation[1]}\n${bgTiled ? "BackgroundTile" : "BackgroundImage"},${bgName}\n` + out
+    if (document.getElementById("background-select").value === "Default") {
+        out = `${lvlTypePrettyName},${lvlName},${board[0].length},${board.length}\nPlayerStartLocation,${startLocation[0]},${startLocation[1]}\n` + out
+    } else {
+        out = `${lvlTypePrettyName},${lvlName},${board[0].length},${board.length}\nPlayerStartLocation,${startLocation[0]},${startLocation[1]}\n${bgTiled ? "BackgroundTile" : "BackgroundImage"},${bgName}\n` + out
+    }
+
+
+
+
     const link = document.createElement("a")
     const file = new Blob([out], {type: "text/plain"})
     link.href = URL.createObjectURL(file)

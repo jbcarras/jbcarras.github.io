@@ -11,8 +11,11 @@ body {
 #zoom-box {
     box-shadow: 1px 1px 3px black;
 }
-#level-container, #toolbar {
+#level-container, #toolbar, #sprite-toolbar {
     background-color: #4b4d4d;
+
+}
+#level-container {
     box-shadow: 1px 1px 3px black
 }
 #secondary-container, #zoom-box {

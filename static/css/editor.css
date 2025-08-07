@@ -2,7 +2,7 @@
     --tile-size: 6.0vh
 }
 body {
-    background-color: lightgray;
+    background-color: darkgray;
     font-family: sans-serif;
 }
 label {
@@ -82,7 +82,7 @@ select {
     overflow: scroll;
     background-color: whitesmoke;
 }
-#toolbar {
+#toolbar, #sprite-toolbar {
     display: flex;
     flex-wrap: wrap;
     flex: 1;
@@ -90,9 +90,10 @@ select {
     justify-content: center;
     padding-top: 10px;
     padding-bottom: 10px;
-    box-shadow: 1px 1px 3px lightgray;
     border-radius: 5px;
+    background-color: lightgray;
 }
+
 #tools, #tiles {
     display: flex;
     flex-wrap: wrap;
@@ -111,7 +112,13 @@ select {
     font-size: 0;
 }
 
-#selector {
+.alt-sprite {
+    margin: 2px;
+}
+.attribute {
+    margin-bottom: 8px;
+}
+#selector, #alternatives-selector {
     min-width: 7vh;
     background-size: contain;
     background-repeat: no-repeat;
@@ -121,9 +128,8 @@ select {
 }
 #level {
     margin: auto;
-    background-size: 10.0vh;
+    background-size: var(--tile-size);
     background-clip: content-box;
-    padding: 8vh;
     flex-grow: 0;
 }
 .row {
