@@ -132,8 +132,8 @@
       "parent": "StaticGameObject",
       "attributes": [],
       "alternatives": [
-        {"displayName": "Bottom Middle", "url": "Ledge.png", "value": "middle"},
         {"displayName": "Bottom Left", "url": "Ledge-BL.png", "value": "left"},
+        {"displayName": "Bottom Middle", "url": "Ledge.png", "value": "middle"},
         {"displayName": "Bottom Right", "url": "Ledge-BR.png","value": "right"}
       ],
       "url": "Ledge.png",
