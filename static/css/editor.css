@@ -44,8 +44,11 @@ hr {
 .center {
     text-align: center;
 }
-#settings > * {
+#settings > * > *{
     margin-bottom: 10px
+}
+#toolbar-settings > select {
+    margin: 4px
 }
 #editor {
     display: flex;
@@ -59,7 +62,6 @@ select {
     border: 1px solid darkgray;
     padding: 5px;
     font-size: small;
-    margin: 4px;
 }
 #secondary-container {
     padding: 2%;
@@ -102,10 +104,10 @@ select {
     justify-content: center;
 }
 .toolbar-item {
-    max-width: 7vh;
-    min-width: 7vh;
-    max-height: 7vh;
-    min-height: 7vh;
+    max-width: 6vh;
+    min-width: 6vh;
+    max-height: 6vh;
+    min-height: 6vh;
     flex: 1;
     background-size: contain;
     cursor: pointer;
@@ -119,11 +121,11 @@ select {
     margin-bottom: 8px;
 }
 #selector, #alternatives-selector {
-    min-width: 7vh;
+    min-width: 6vh;
     background-size: contain;
     background-repeat: no-repeat;
     background-image: url("../../static/tiles/Selector.png");
-    min-height: 7vh;
+    min-height: 6vh;
     z-index: 1;
 }
 #level {
@@ -145,4 +147,33 @@ select {
     padding-bottom: var(--tile-size);
     font-size: 0;
     cursor: pointer;
+}
+#csv-editor {
+    width: 85%;
+    height: 85%;
+    margin: 3% auto auto;
+}
+#csv-entry {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border: none;
+    resize: none;
+    font-family: monospace;
+    font-size: 12px;
+    box-shadow: 1px 1px 3px darkgray;
+}
+#alert {
+    background-color: #cf2929;
+    padding: 10px;
+    border-radius: 10px;
+    transition: opacity 5s;
+}
+#alert-container {
+    position: absolute;
+    right: 0;
+    margin: 8px;
+}
+#customizer > * {
+    margin-bottom: 8px;
 }

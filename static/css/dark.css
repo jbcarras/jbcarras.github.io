@@ -8,7 +8,7 @@ body {
     background-color: #cf2929;
     border: 1px solid #cf2929
 }
-#zoom-box {
+#zoom-box, #csv-entry {
     box-shadow: 1px 1px 3px black;
 }
 #level-container, #toolbar, #sprite-toolbar {

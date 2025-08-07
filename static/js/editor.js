@@ -19,12 +19,15 @@ class Item {
 const tools = {
     "Eraser": new Item("Eraser", "Erase tiles you previously drew.", "", [], "Eraser.png", 0, ["topdown", "platformer"]),
     "Player": new Item("Player", "Draw where the player appears when the level is loaded.", "", [], "Player.png", 0, ["topdown", "platformer"]),
-    "Customizer": new Item("Customizer", "Create and manage custom tiles.", "", [], "Custom.png", 0, ["topdown", "platformer"])
+    "Customizer": new Item("Customizer", "Create and manage custom tiles.", "", [], "Custom.png", 0, ["topdown", "platformer"]),
+    "CSV Editor": new Item("CSV Editor", "Manually edit the level's CSV output.", "", [], "BackgroundTool.png", 0, ["topdown", "platformer"]),
 }
 
 let toolbarLookup = {...tools}
 
 let items = {}
+
+let failed = []
 
 const selector = `static/tiles/Selector.png`
 
@@ -47,7 +50,7 @@ let playerLocation = ["",""]
 
 let customConfig = {}
 
-const randomColors = ["#A9A9A9", "#813d9c", "#c01c28", "#1c71d8", "#2ec27e"]
+const randomColors = ["#F94144", "#F3722C", "#F8961E", "#F9C74F", "#90BE6D", "#43AA8B", "#577590"]
 
 initEditor()
 
@@ -55,6 +58,7 @@ document.getElementById("name").value = ""
 document.getElementById("width").value = 12
 document.getElementById("height").value = 8
 document.getElementById("zoom").value = 50
+document.getElementById("csv-entry").value = ""
 
 if (localStorage.getItem("theme") === "dark") {
     setDarkMode(true)
@@ -68,6 +72,7 @@ function initEditor() {
     document.getElementById("eraser-button").addEventListener("click", (event) => {setActiveItem(event)})
     document.getElementById("player-button").addEventListener("click", (event) => setActiveItem(event))
     document.getElementById("custom-button").addEventListener("click", (event) => setActiveItem(event))
+    document.getElementById("csv-button").addEventListener("click", (event) => setActiveItem(event))
     const reset = document.getElementById("reset")
     reset.addEventListener("click", resetLevel)
 
@@ -371,6 +376,7 @@ function setPlayerLocation(x=playerLocation[0], y=playerLocation[1]) {
 }
 
 function setActiveItem(event) {
+    let prevItem = activeItem
     let item = event.currentTarget
     if (document.getElementById("selector") != null) {
         document.getElementById("selector").remove()
@@ -381,6 +387,11 @@ function setActiveItem(event) {
     item.append(selector)
     activeItem = toolbarLookup[item.textContent].name
     renderAttributes()
+    if (prevItem === "CSV Editor" && toolbarLookup[event.currentTarget.textContent].name !== "CSV Editor") {
+        toggleCSVEditor(false)
+    } else if (activeItem === "CSV Editor") {
+        toggleCSVEditor(true)
+    }
 }
 
 function exportCustom() {
@@ -455,6 +466,9 @@ function drawEvent(event) {
         }
         event.target.textContent = toolbarLookup[activeItem].name
         event.target.dataset.type = "tile"
+
+
+
         const attributes = document.getElementsByClassName("attribute").length !== 0 && !(toolbarLookup[activeItem].custom && document.getElementById("Attributes").value.length === 0) ? "," + Array.from(document.getElementsByClassName("attribute")).map((element) => element.value).reduce((a, b) => a + "," + b) : ""
         board[Number(event.target.dataset.y)][Number(event.target.dataset.x)] = toolbarLookup[activeItem].parent + "," + toolbarLookup[activeItem].name + "," + event.target.dataset.x + "," + event.target.dataset.y + attributes + "\n"
     }
@@ -474,7 +488,26 @@ function eraseEvent(event) {
     })
 }
 
+function toggleCSVEditor(to) {
+    if (to) {
+        document.getElementById("csv-editor").style.display = "block"
+        document.getElementById("level").style.display = "none"
+        document.getElementById("zoom-box").style.display = "none"
+        document.getElementById("visual-mode-controls").style.display = "none"
+        document.getElementById("toolbar-settings").style.display = "none"
+        document.getElementById("csv-entry").value = levelToCSV()
+    } else {
+        document.getElementById("csv-editor").style.display = "none"
+        document.getElementById("level").style.display = "block"
+        document.getElementById("zoom-box").style.display = "flex"
+        document.getElementById("visual-mode-controls").style.display = "block"
+        document.getElementById("toolbar-settings").style.display = "block"
+        csvToLevel(document.getElementById("csv-entry").value)
+    }
+}
+
 function resetLevel() {
+    failed = []
     document.getElementById("level").remove()
     const nlevel = document.createElement("div")
     nlevel.id = "level"
@@ -500,15 +533,28 @@ function resetLevel() {
     changeBackground(document.getElementById("background-select").value)
     board = Array(Number(document.getElementById("height").value)).fill("").map(() => Array(Number(document.getElementById("width").value)).fill(""))
     setPlayerLocation("", "")
+    if (activeItem === "CSV Editor") {
+        document.getElementById("level").style.display = "none"
+        document.getElementById("zoom-box").style.display = "none"
+        document.getElementById("csv-editor").style.display = "block"
+        document.getElementById("csv-entry").value = levelToCSV()
+    }
 }
-
-let stu = ""
 
 function importLevel(file) {
     const reader = new FileReader()
     reader.readAsText(file)
     reader.onload = () => {
-        const lvl = reader.result.split("\n")
+        if (activeItem === "CSV Editor") {
+            document.getElementById("csv-entry").value = reader.result.toString()
+        } else {
+            csvToLevel(reader.result.toString())
+        }
+    }
+}
+
+function csvToLevel(csv) {
+    const lvl = csv.split("\n")
         const typeSelect = document.getElementById("type")
         const selType = Object.keys(types).find((type) => {return types[type] === lvl[0].split(',')[0]})
         if (selType !== undefined) {
@@ -526,13 +572,21 @@ function importLevel(file) {
         document.getElementById("width").value = lvl[0].split(',')[2]
         document.getElementById("height").value = lvl[0].split(',')[3]
         resetLevel()
-        let width = lvl[1].split(',')[1]
-        let height = lvl[1].split(',')[2]
-        setPlayerLocation(width, height)
 
-        if (lvl[1].split(',')[1] !== "" && lvl[1].split(',')[2] !== "") {
-            if (Number(width) === Math.floor(Number(width)) && Number(height) === Math.floor(Number(height))) {
-                board[height][width] = `,Player,${width},${height}`
+        if (lvl[1].split(',')[0] !== "PlayerStartLocation" || lvl[1].split(',').length < 3 || isNaN(Number(lvl[1].split(',')[1])) || isNaN(Number(lvl[1].split(',')[2]))) {
+            sendAlert("Failed to parse player start location.")
+            setPlayerLocation("","")
+        } else {
+            let width = lvl[1].split(',')[1]
+            let height = lvl[1].split(',')[2]
+            setPlayerLocation(width, height)
+
+            if (lvl[1].split(',')[1] !== "" && lvl[1].split(',')[2] !== "") {
+                if (Number(width) === Math.floor(Number(width)) && Number(height) === Math.floor(Number(height))) {
+                    board[height][width] = `,Player,${width},${height}`
+                } else {
+                    sendAlert("Player start location parsed, but will not be displayed in visual mode.")
+                }
             }
         }
         let contentStart = 3
@@ -552,11 +606,18 @@ function importLevel(file) {
             document.getElementById("background-select").dispatchEvent(new Event("change"))
         }
 
+        failed = []
+
         for (let line of lvl.slice(contentStart)) {
             if (line !== "") {
-                let width = line.split(',')[2]
-                let height = line.split(',')[3]
-                board[height][width] = line + "\n"
+                try {
+                    let width = line.split(',')[2]
+                    let height = line.split(',')[3]
+                    board[height][width] = line + "\n"
+                } catch (e) {
+                    failed.push(line)
+                }
+
             }
         }
         for (let y = 0; y < board.length; y++) {
@@ -568,6 +629,9 @@ function importLevel(file) {
                         div.style.backgroundImage = `url(${items[board[y][x].split(',')[1]].url})`
                     } else {
                         let item = toolbarLookup[board[y][x].split(',')[1]]
+                        if (item.name === "Player") {
+                            div.id = "player"
+                        }
                         if (item.alternatives.length !== 0) {
                         let alternative = item.alternatives.find((item) => {
                             let entry = board[y][x].split(',')
@@ -582,10 +646,12 @@ function importLevel(file) {
             }
         }
         renderToolbar()
-    }
+        if (failed.length > 0) {
+            sendAlert(`Failed to parse ${failed.length} ${failed.length === 1 ? "line" : "lines"}. The offending ${failed.length === 1 ? "line" : "lines"} can be viewed and modified at the bottom of the CSV editor.`)
+        }
 }
 
-function exportLevel() {
+function levelToCSV() {
     let lvlName = document.getElementById("name").value === "" ? "level" : document.getElementById("name").value
     let out = ""
     let startLocation = playerLocation
@@ -605,14 +671,42 @@ function exportLevel() {
     } else {
         out = `${lvlTypePrettyName},${lvlName},${board[0].length},${board.length}\nPlayerStartLocation,${startLocation[0]},${startLocation[1]}\n${bgTiled ? "BackgroundTile" : "BackgroundImage"},${bgName}\n` + out
     }
+    failed.forEach((line) => {out += `${line}\n`})
+
+    return out
+}
 
 
 
-
+function exportLevel() {
+    let out = ""
+    let lvlName = ""
+    if (activeItem === "CSV Editor") {
+        out = document.getElementById("csv-entry").value
+        lvlName = out.split('\n')[0].split(',')[1]
+    } else {
+        out = levelToCSV()
+        lvlName = document.getElementById("name").value === "" ? "level" : document.getElementById("name").value
+    }
     const link = document.createElement("a")
     const file = new Blob([out], {type: "text/plain"})
     link.href = URL.createObjectURL(file)
     link.download = lvlName + ".csv"
     link.click()
     URL.revokeObjectURL(link.href)
+}
+
+function sendAlert(text) {
+    let alert = document.createElement("div")
+    alert.textContent = text
+    alert.id = "alert"
+    document.getElementById("alert-container").prepend(alert)
+
+    setTimeout(() => {
+        alert.style.opacity = "0"
+    }, 5000)
+
+    setTimeout(() => {
+        alert.remove()
+    }, 10000)
 }
