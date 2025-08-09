@@ -54,12 +54,6 @@ const randomColors = ["#F94144", "#F3722C", "#F8961E", "#F9C74F", "#90BE6D", "#4
 
 initEditor()
 
-document.getElementById("name").value = ""
-document.getElementById("width").value = 12
-document.getElementById("height").value = 8
-document.getElementById("zoom").value = 50
-document.getElementById("csv-entry").value = ""
-
 if (localStorage.getItem("theme") === "dark") {
     setDarkMode(true)
     document.getElementById("dark-mode").checked = true
@@ -69,6 +63,11 @@ if (localStorage.getItem("theme") === "dark") {
 }
 
 function initEditor() {
+    document.getElementById("name").value = ""
+    document.getElementById("width").value = 12
+    document.getElementById("height").value = 8
+    document.getElementById("zoom").value = 50
+    document.getElementById("csv-entry").value = ""
     document.getElementById("eraser-button").addEventListener("click", (event) => {setActiveItem(event)})
     document.getElementById("player-button").addEventListener("click", (event) => setActiveItem(event))
     document.getElementById("custom-button").addEventListener("click", (event) => setActiveItem(event))
@@ -239,12 +238,14 @@ function renderAttributes() {
     let attributesSec = document.getElementById("attributes-section")
     attributesSec.innerHTML = ""
     let heading = document.createElement("h2")
+    let parent = document.createElement("h4")
     let description = document.createElement("p")
     let attributes = document.createElement("div")
     attributes.id = "attributes"
     heading.textContent = toolbarLookup[activeItem].name
+    parent.textContent = `${toolbarLookup[activeItem].parent}`
     description.textContent = toolbarLookup[activeItem].description
-    attributesSec.append(heading, description)
+    attributesSec.append(heading, parent, description)
     if (activeItem === "Player") {
         document.getElementById("player-info").style.display = "block"
     } else {
@@ -542,19 +543,44 @@ function resetLevel() {
 }
 
 function importLevel(file) {
-    const reader = new FileReader()
-    reader.readAsText(file)
-    reader.onload = () => {
-        if (activeItem === "CSV Editor") {
-            document.getElementById("csv-entry").value = reader.result.toString()
-        } else {
-            csvToLevel(reader.result.toString())
+    try {
+        const reader = new FileReader()
+        reader.readAsText(file)
+        reader.onload = () => {
+            let result = reader.result.toString()
+            if (activeItem === "CSV Editor" && validateCSV(result)) {
+                document.getElementById("csv-entry").value = reader.result.toString()
+                sendAlert("Imports are not processed (including error handling) until you leave CSV Editor mode.")
+            } else if (!validateCSV(result)) {
+                sendAlert("Failed to parse level. Provided file does not match level format.")
+            } else {
+                csvToLevel(reader.result.toString())
+            }
         }
+    } catch (e) {
+        sendAlert(`Catastrophic failure to import level: ${e}.`)
     }
 }
 
+function validateCSV(csv) {
+    const lines = csv.split("\n")
+    if (lines.length < 2) {
+        return false
+    }
+    if (lines[0].split(',').length !== 4) {
+        return false
+    }
+    return lines[1].split(',')[0] === "PlayerStartLocation";
+
+ }
+
 function csvToLevel(csv) {
-    const lvl = csv.split("\n")
+    if (!validateCSV(csv)) {
+        sendAlert("Failed to parse level. Provided file does not match level format.")
+        return
+    }
+    try {
+        const lvl = csv.split("\n")
         const typeSelect = document.getElementById("type")
         const selType = Object.keys(types).find((type) => {return types[type] === lvl[0].split(',')[0]})
         if (selType !== undefined) {
@@ -649,6 +675,11 @@ function csvToLevel(csv) {
         if (failed.length > 0) {
             sendAlert(`Failed to parse ${failed.length} ${failed.length === 1 ? "line" : "lines"}. The offending ${failed.length === 1 ? "line" : "lines"} can be viewed and modified at the bottom of the CSV editor.`)
         }
+    } catch (e) {
+        sendAlert(`Level import failed: ${e}`)
+        initEditor()
+    }
+
 }
 
 function levelToCSV() {
@@ -701,6 +732,12 @@ function sendAlert(text) {
     alert.textContent = text
     alert.id = "alert"
     document.getElementById("alert-container").prepend(alert)
+    let close = document.createElement("span")
+    close.textContent = "×"
+    close.onclick = () => {alert.remove()}
+    close.style.marginRight = "5px"
+    close.style.cursor = "pointer"
+    alert.prepend(close)
 
     setTimeout(() => {
         alert.style.opacity = "0"

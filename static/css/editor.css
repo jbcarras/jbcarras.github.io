@@ -168,6 +168,8 @@ select {
     padding: 10px;
     border-radius: 10px;
     transition: opacity 5s;
+    margin-bottom: 2px;
+    color: whitesmoke;
 }
 #alert-container {
     position: absolute;
