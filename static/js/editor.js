@@ -636,18 +636,13 @@ function csvToLevel(csv) {
 
         for (let line of lvl.slice(contentStart)) {
             if (line !== "") {
-                for (let line of lvl.slice(contentStart)) {
-                if (line !== "") {
-                    let width = line.split(',')[2]
-                    let height = line.split(',')[3]
-                    if (isNaN(Number(width)) || isNaN(Number(height))) {
-                        failed.push(line)
-                    } else {
-                        board[height][width] = line + "\n"
-                    }
+                let width = line.split(',')[2]
+                let height = line.split(',')[3]
+                if (isNaN(Number(width)) || isNaN(Number(height))) {
+                    failed.push(line)
+                } else {
+                    board[height][width] = line + "\n"
                 }
-        }
-
             }
         }
         for (let y = 0; y < board.length; y++) {
