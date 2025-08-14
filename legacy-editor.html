@@ -5,26 +5,14 @@
     <link rel="stylesheet" href="static/css/editor.css">
     <link rel="stylesheet" id="dark-mode-style" href="static/css/dark.css" disabled>
     <link rel="shortcut icon" href="static/favicon.ico">
-    <script src="static/js/editor.js" defer></script>
-    <script src="static/js/canvas.js" defer></script>
+    <script src="static/js/legacy-editor.js" defer></script>
     <title>Level Editor</title>
 </head>
 <body>
 <div id="alert-container"></div>
 <div id="zoom-box">
-            <label for="zoom">Zoom</label>
-            <input type="range" id="zoom" value="31" min="10" max="100" onchange="redrawCanvas(); manipulateCanvasMargin()">
-            <label for="grid-scale">Grid Scale</label>
-                <select id="grid-scale" onchange="gridScale = this.value; redrawCanvas()">
-                    <option value="1">1 Tile</option>
-                    <option value="2">1/2 Tile</option>
-                    <option value="4">1/4 Tile</option>
-                </select>
-</div>
-<div style="position: absolute;
-    right: 0;
-    margin: 8px;">
-    <div class="alert" id="persistent-alert-thing"><span onclick="document.getElementById('persistent-alert-thing').remove()" style="cursor: pointer">×</span> The visual part of the editor has been completely rewritten. The old editor can be accessed <a href="/legacy-editor.html">here</a> until I trust it.</div>
+    <label for="zoom">Zoom</label>
+    <input name="zoom" id="zoom" type="range" min="10" max="100" value="50" onchange="document.querySelector(':root').style.setProperty('--tile-size', `${12.0 * this.value / 100}vh`)">
 </div>
 <div id="editor">
     <div id="level-container">
@@ -32,7 +20,7 @@
             <label for="csv-entry">CSV Entry</label>
             <textarea id="csv-entry" name="csv-entry"></textarea>
         </div>
-        <canvas id="level-visual"></canvas>
+        <div id="level"></div>
     </div>
     <div id="secondary-container">
         <div id="settings">
@@ -74,6 +62,7 @@
                 <label for="dark-mode">Dark Mode</label>
                 <input id="dark-mode" name="dark-mode" type="checkbox"
                     onclick="setDarkMode(this.checked); document.styleSheets[0].insertRule('* {transition: background-color 0.25s linear, border 0.25s linear, box-shadow 0.25s linear}')">
+
             </div>
             <hr/>
         </div>
@@ -84,6 +73,15 @@
             <p class="center">Left Click - Draw</p>
             <p class="center">Right Click - Erase</p>
         </div>
+            <div id="player-info" style="display: none">
+                <h3>Manual Override</h3>
+                <label for="player-x">Player X-Coordinate</label>
+                <input type="number" value="" id="player-x" size="3" name="player-x" autocomplete="off" onchange="this.value = Math.max(this.value, 0); setPlayerLocation(this.value, document.getElementById('player-y').value);">
+                <br/>
+                <label for="player-y">Player Y-Coordinate</label>
+                <input type="number" value="" id="player-y" size="3" name="player-y" autocomplete="off" onchange="this.value = Math.max(this.value, 0); setPlayerLocation(document.getElementById('player-x').value, this.value)">
+                <p>Note: Player will not appear in the preview if you manually input the start location here.</p>
+            </div>
             <div id="customizer" style="display: none">
                 <label for="custom-parent">Parent</label>
                 <br>

@@ -7,7 +7,7 @@
       "description": "A wall for top-down levels.",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "Wall.png",
+      "url": "static/tiles/Wall.png",
       "task": 1,
       "allowedTypes": ["topdown", "openworld"]
     },
@@ -15,7 +15,7 @@
       "description": "A wall for platformer levels. Accounts for gravity.",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "PlatformerWall.png",
+      "url": "static/tiles/PlatformerWall.png",
       "task": 3,
       "allowedTypes": ["platformer","sidescroller"]
     },
@@ -26,7 +26,7 @@
         {"name": "MaxHP", "defaultVal": 10, "inputType": "number"},
         {"name": "Strength", "defaultVal": 3, "inputType": "number"}
       ],
-      "url": "Enemy.png",
+      "url": "static/tiles/Enemy.png",
       "task": 1,
       "allowedTypes": ["topdown", "openworld"]
     },
@@ -34,7 +34,7 @@
       "description": "A slow-moving but strong projectile.",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "Axe.png",
+      "url": "static/tiles/Axe.png",
       "task": 5,
       "allowedTypes": ["topdown", "openworld"]
     },
@@ -42,7 +42,7 @@
       "description": "Calls advanceLevel() when a Player collides.",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "Goal.png",
+      "url": "static/tiles/Goal.png",
       "task": 1,
       "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
     },
@@ -52,7 +52,7 @@
       "attributes": [
         {"name": "Heal", "defaultVal": 10, "inputType": "number"}
       ],
-      "url": "RedPotion.png",
+      "url": "static/tiles/RedPotion.png",
       "task": 3,
       "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
     },
@@ -62,7 +62,7 @@
       "attributes": [
         {"name": "Heal", "defaultVal": 10, "inputType": "number"}
       ],
-      "url": "BluePotion.png",
+      "url": "static/tiles/BluePotion.png",
       "task": 5,
       "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
     },
@@ -70,7 +70,7 @@
       "description": "An indestructible and immobile enemy tower.",
       "parent": "DynamicGameObject",
       "attributes": [],
-      "url": "Tower.png",
+      "url": "static/tiles/Tower.png",
       "task": 1,
       "allowedTypes": ["topdown", "openworld"]
     },
@@ -78,7 +78,7 @@
       "description": "A fast but weaker projectile.",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "Magic.png",
+      "url": "static/tiles/Magic.png",
       "task": 5,
       "allowedTypes": ["topdown", "openworld"]
     },
@@ -86,7 +86,7 @@
       "description": "A fatal obstacle.",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "Spike.png",
+      "url": "static/tiles/Spike.png",
       "task": 3,
       "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
     },
@@ -97,7 +97,7 @@
         {"name": "MaxHP", "defaultVal": 10, "inputType": "number"},
         {"name": "Strength", "defaultVal": 1, "inputType": "number"}
       ],
-      "url": "SmartEnemy.png",
+      "url": "static/tiles/SmartEnemy.png",
       "task": 6,
       "allowedTypes": ["topdown", "openworld"]
     },
@@ -107,7 +107,7 @@
       "attributes": [
         {"name": "MaxHP", "defaultVal": 10, "inputType": "number"},
         {"name": "Strength", "defaultVal": 1, "inputType": "number"}],
-      "url": "Archer.png",
+      "url": "static/tiles/Archer.png",
       "task": 7,
       "allowedTypes": ["topdown", "openworld"]
     },
@@ -115,7 +115,7 @@
       "description": "A wall that gets pushed when collided with.",
       "parent": "DynamicGameObject",
       "attributes": [],
-      "url": "PushWall.png",
+      "url": "static/tiles/PushWall.png",
       "task": 7,
       "allowedTypes": ["topdown","openworld"]
     },
@@ -123,7 +123,7 @@
       "description": "A platform that can be jumped through.",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "Platform.png",
+      "url": "static/tiles/Platform.png",
       "task": 7,
       "allowedTypes": ["platformer","sidescroller"]
     },
@@ -132,11 +132,11 @@
       "parent": "StaticGameObject",
       "attributes": [],
       "alternatives": [
-        {"displayName": "Bottom Left", "url": "Ledge-BL.png", "value": "left"},
-        {"displayName": "Bottom Middle", "url": "Ledge.png", "value": "middle"},
-        {"displayName": "Bottom Right", "url": "Ledge-BR.png","value": "right"}
+        {"displayName": "Bottom Left", "url": "static/tiles/Ledge-BL.png", "value": "left"},
+        {"displayName": "Bottom Middle", "url": "static/tiles/Ledge.png", "value": "middle"},
+        {"displayName": "Bottom Right", "url": "static/tiles/Ledge-BR.png","value": "right"}
       ],
-      "url": "Ledge.png",
+      "url": "static/tiles/Ledge.png",
       "task": 7,
       "allowedTypes": ["topdown","openworld"]
     },
@@ -146,7 +146,7 @@
       "attributes": [
         {"name": "Text", "defaultVal": "", "inputType": "text"}
       ],
-      "url": "InfoNode.png",
+      "url": "static/tiles/InfoNode.png",
       "task": 7,
       "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
     },
@@ -154,7 +154,7 @@
       "description": "Immovable horse of destruction.",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "Horse.png",
+      "url": "static/tiles/Horse.png",
       "task": 7,
       "allowedTypes": ["topdown", "openworld"]
     },
@@ -162,7 +162,7 @@
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "QuestionBlock.png",
+      "url": "static/tiles/QuestionBlock.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -170,7 +170,7 @@
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "Block.png",
+      "url": "static/tiles/Block.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -178,7 +178,7 @@
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "UpPipeLeft.png",
+      "url": "static/tiles/UpPipeLeft.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -186,7 +186,7 @@
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "UpPipeRight.png",
+      "url": "static/tiles/UpPipeRight.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -194,7 +194,7 @@
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "UpPipeTopLeft.png",
+      "url": "static/tiles/UpPipeTopLeft.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -202,7 +202,7 @@
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "UpPipeTopRight.png",
+      "url": "static/tiles/UpPipeTopRight.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -210,7 +210,7 @@
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "Selector.png",
+      "url": "static/tiles/Selector.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -218,7 +218,7 @@
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "Bricks.png",
+      "url": "static/tiles/Bricks.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -226,7 +226,7 @@
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "Ground.png",
+      "url": "static/tiles/Ground.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -234,7 +234,7 @@
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "Flag.png",
+      "url": "static/tiles/Flag.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -242,7 +242,7 @@
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "Flagpole.png",
+      "url": "static/tiles/Flagpole.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -250,7 +250,7 @@
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "FlagTip.png",
+      "url": "static/tiles/FlagTip.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -258,7 +258,7 @@
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "FlagTop.png",
+      "url": "static/tiles/FlagTop.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -266,7 +266,7 @@
       "description": "",
       "parent": "DynamicGameObject",
       "attributes": [],
-      "url": "Goomba.png",
+      "url": "static/tiles/Goomba.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -274,7 +274,7 @@
       "description": "",
       "parent": "DynamicGameObject",
       "attributes": [],
-      "url": "Turtle.png",
+      "url": "static/tiles/Turtle.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -282,7 +282,7 @@
       "description": "",
       "parent": "DynamicGameObject",
       "attributes": [],
-      "url": "BuzzyBeetle.png",
+      "url": "static/tiles/BuzzyBeetle.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     },
@@ -290,7 +290,7 @@
       "description": "",
       "parent": "DynamicGameObject",
       "attributes": [],
-      "url": "Mario.png",
+      "url": "static/tiles/Mario.png",
       "task": 8,
       "allowedTypes": ["sidescroller"]
     }

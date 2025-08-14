@@ -77,12 +77,17 @@ select {
 }
 #level-container {
     flex: 85;
+    align-items: center;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     height: 90vh;
     box-shadow: 3px 2px 3px darkgray;
     overflow: scroll;
     background-color: whitesmoke;
+}
+#level-visual {
+    flex-grow: 0;
+    margin: auto;
 }
 #toolbar, #sprite-toolbar {
     display: flex;
@@ -163,7 +168,7 @@ select {
     font-size: 12px;
     box-shadow: 1px 1px 3px darkgray;
 }
-#alert {
+.alert {
     background-color: #cf2929;
     padding: 10px;
     border-radius: 10px;
@@ -178,4 +183,7 @@ select {
 }
 #customizer > * {
     margin-bottom: 8px;
+}
+#level-visual {
+    margin: auto;
 }
