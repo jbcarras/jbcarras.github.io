@@ -728,7 +728,7 @@ function exportLevel() {
 function sendAlert(text) {
     let alert = document.createElement("div")
     alert.textContent = text
-    alert.id = "alert"
+    alert.className = "alert"
     document.getElementById("alert-container").prepend(alert)
     let close = document.createElement("span")
     close.textContent = "×"

@@ -187,3 +187,13 @@ select {
 #level-visual {
     margin: auto;
 }
+.alert > button {
+    margin-left: 10px;
+    background-color: transparent;
+    border: 2px solid whitesmoke;
+    color: whitesmoke;
+}
+.alert > button:hover {
+    background-color: whitesmoke;
+    color: #cf2929;
+}

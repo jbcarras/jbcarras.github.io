@@ -21,11 +21,6 @@
                     <option value="4">1/4 Tile</option>
                 </select>
 </div>
-<div style="position: absolute;
-    right: 0;
-    margin: 8px;">
-    <div class="alert" id="persistent-alert-thing"><span onclick="document.getElementById('persistent-alert-thing').remove()" style="cursor: pointer">×</span> The visual part of the editor has been completely rewritten. The old editor can be accessed <a href="/legacy-editor.html">here</a> until I trust it.</div>
-</div>
 <div id="editor">
     <div id="level-container">
         <div id="csv-editor" style="display: none">
@@ -40,17 +35,17 @@
             <div id="visual-mode-controls">
                 <label for="name">Level Name</label>
                 <input id="name" name="name" type="text" oninput="{
-                        const legal = /[a-z]|[0-9]|[!@#$^&()\-_+\[\]{}]/i
+                        const legal = /[a-z]|[0-9]|['!@#$^&()\-_+\[\]{}]/i
                         this.value = Array.from(this.value).filter((char) => {return legal.test(char)}).join('')
                     }">
                 <br/>
                 <label for="width">Width</label>
-                <input id="width" name="width" type="number" value="12" min="0" size="3"
-                       oninput="this.value = Math.max(this.value, 0)">
+                <input id="width" name="width" type="number" value="12" min="1" size="3"
+                       oninput="this.value = Math.max(this.value, 1); resizeLevel()">
                 <br/>
                 <label for="height">Height</label>
-                <input id="height" name="height" type="number" value="8" min="0" size="3"
-                       oninput="this.value = Math.max(this.value, 0)">
+                <input id="height" name="height" type="number" value="8" min="1" size="3"
+                       oninput="this.value = Math.max(this.value, 1); resizeLevel()">
                 <br/>
                 <label for="background-select">Background Select</label>
                 <select id="background-select" name="background-select"></select>
@@ -60,7 +55,15 @@
                     <input id="bg-filename" name="bg-filename" type="text" value="Grass.png" onload="backgroundFname = this.value" onchange="backgroundFname = this.value">
                     <br/>
                     <label for="bg-tiled">Tiled Background</label>
-                    <input id="bg-tiled" name="bg-tiled" type="checkbox" checked onload="bgTiled = this.checked" onclick="bgTiled = this.checked">
+                    <input id="bg-tiled" name="bg-tiled" type="checkbox" checked onload="bgTiled = this.checked" onclick="bgTiled = this.checked; document.getElementById('tile-controls').style.display = this.checked ? 'block' : 'none'">
+                    <span id="tile-controls" style="display: none">
+                        <br/>
+                        <label for="bg-col">Tile Column</label>
+                        <input id="bg-col" name="bg-col" type="number" value="0" min="0" size="3" oninput="this.value = Math.max(this.value, 0)">
+                        <br/>
+                        <label for="bg-row">Tile Row</label>
+                        <input id="bg-row" name="bg-row" type="number" value="0" min="0" size="3" oninput="this.value = Math.max(this.value, 0)">
+                    </span>
                 </div>
             </div>
             <div id="global-controls">

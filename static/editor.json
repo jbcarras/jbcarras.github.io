@@ -1,7 +1,11 @@
 {
   "tasks": ["Task 1", "Task 2", "Task 3", "Task 4", "Task 5", "Task 6", "Bonus", "Mario"],
   "types": {"topdown": "TopDownLevel", "platformer": "PlatformerLevel", "openworld": "OpenWorldLevel", "sidescroller":  "SideScrollerLevel"},
-  "backgrounds": [{"filename": "Grass.png", "tiled": true},{"filename": "Sky.png", "tiled": true}],
+  "backgrounds": [{"localFilename": "static/tiles/Grass.png", "engineFilename": "MiniWorldSprites/Ground/Grass.png","tiled": true,"col": 2,"row": 0},
+    {"localFilename": "static/backgrounds/smb_background.png", "engineFilename": "mario/smb_background.png","tiled":false},
+  {"localFilename": "static/tiles/GrassBlue.png", "engineFilename": "MiniWorldSprites/Ground/Grass.png", "tiled": true, "col": 0,"row": 0},
+    {"localFilename": "static/backgrounds/mountains_1.png", "engineFilename": "mountains/mountains_1/1.png,mountains/mountains_1/2.png,mountains/mountains_1/3.png,mountains/mountains_1/4.png,mountains/mountains_1/5.png","tiled":false},
+  {"localFilename": "static/backgrounds/peaks_1.png", "engineFilename": "peaks/peaks_1/1.png,peaks/peaks_1/2.png,peaks/peaks_1/3.png,peaks/peaks_1/4.png,peaks/peaks_1/5.png","tiled":false}],
   "items": {
     "Wall": {
       "description": "A wall for top-down levels.",
@@ -90,7 +94,7 @@
       "task": 3,
       "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
     },
-    "SmartEnemy": {
+    "Minotaur": {
       "description": "A smarter enemy that hunts the player down, avoiding walls.",
       "parent": "DynamicGameObject",
       "attributes": [

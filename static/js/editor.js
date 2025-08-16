@@ -21,14 +21,21 @@ class Item {
 }
 
 class Background {
-    constructor(filename, tiled) {
+    constructor(filename, imageFilename, tiled, col=undefined, row=undefined) {
         this.filename = filename
+        this.displayName = imageFilename.split("/")[imageFilename.split("/").length-1].split(".")[0]
         this.tiled = tiled
         this.image = new Image()
-        this.image.src = `static/tiles/${filename}`
+        this.image.src = `${imageFilename}`
+        this.col = col
+        this.row = row
         if (this.tiled) {
             this.image.width = 128
             this.image.height = 128
+            this.displayName = `${this.displayName} (${this.col}, ${this.row})`
+        } else {
+            this.image.width *= 8
+            this.image.height *= 8
         }
     }
 }
@@ -53,18 +60,18 @@ let toolbar = document.getElementById("toolbar")
 let types = {}
 
 
-let backgrounds = {}
-let activeBackground = "Grass.png"
+let globalBackgrounds = []
+let bgMap = {}
 
-let globalBackgrounds = {}
+const defaultBackground = new Background("default", "static/tiles/Grass.png", true)
+const customBackground = new Background("custom", "static/tiles/Grass.png", true)
 
-let backgroundFname = "Grass.png"
-let bgTiled= false
+
+let activeBackground = defaultBackground
 
 let activeItem = ""
 let type = ""
 let task = 0
-let board = []
 
 let customConfig = {}
 
@@ -127,19 +134,39 @@ function initEditor() {
             initTasks(data["tasks"])
             initTypes(data["types"])
             initItems(data["items"])
-            resetLevel()
             initBackgrounds(data["backgrounds"])
         renderToolbar()
-        }).then(() => initCanvas())
+        }).then(() => {initCanvas(); resetCanvas()
+        }).then(() => resetLevel())
+
+    if (!localStorage.getItem("seen-new-editor-warning")) {
+        localStorage.setItem("seen-new-editor-warning", true)
+        const oldBtn = document.createElement("button")
+        oldBtn.textContent = "Use Old Editor"
+        oldBtn.addEventListener("click", () => {
+            window.location.href = "/legacy-editor.html"
+        })
+
+        sendAlert("Old editor will be removed very soon. Also this warning won't show ever again.", oldBtn, true)
+    }
 }
 
 function initBackgrounds(backgrounds) {
     let selector = document.getElementById("background-select")
     for (let background of backgrounds) {
-        globalBackgrounds[background["filename"]] = new Background(background["filename"], background["tiled"])
+        let bg = new Background(background["engineFilename"], background["localFilename"], background["tiled"])
+        if (background["tiled"]) {
+            bg = new Background(background["engineFilename"], background["localFilename"], background["tiled"], background["col"], background["row"])
+            bgMap[bg.displayName] = bg
+            globalBackgrounds.push(bg)
+        } else {
+            bgMap[bg.displayName] = bg
+            globalBackgrounds.push(bg)
+        }
+
         let select = document.createElement("option")
-        select.value = background["filename"]
-        select.textContent = background["filename"]
+        select.value = bg.displayName
+        select.textContent = bg.displayName
         selector.append(select)
     }
     let custom = document.createElement("option")
@@ -157,10 +184,17 @@ function initBackgrounds(backgrounds) {
         } else {
             document.getElementById("background-options").style.display = "none"
         }
-        activeBackground = event.target.value
+        if (event.target.value === "Default") {
+            activeBackground = defaultBackground
+        } else if (event.target.value === "Custom") {
+            activeBackground = customBackground
+        } else {
+            activeBackground = bgMap[event.target.value]
+        }
         redrawCanvas()
-        changeBackground(event.target.value)
+        changeBackground(activeBackground)
     })
+    activeBackground = globalBackgrounds[0]
 }
 
 
@@ -240,6 +274,31 @@ function renderToolbar() {
     }
 }
 
+function resizeLevel() {
+    lvlHeight = Number(document.getElementById("height").value)
+    lvlWidth = Number(document.getElementById("width").value)
+
+    let oob = Object.entries(levelMap).filter(([_, entry]) => { return entry.split(',')[2] >= lvlWidth || entry.split(',')[3] >= lvlHeight })
+
+    redrawCanvas()
+    manipulateCanvasMargin()
+
+    function clearOOB() {
+        for (const [item, _] of oob) {
+            delete levelMap[item]
+        }
+        redrawCanvas()
+        sendAlert("Cleared out of bounds tiles.")
+    }
+
+    if (Object.keys(oob).length !== 0) {
+        const button = document.createElement("button")
+        button.textContent = "Remove"
+        button.addEventListener("click", clearOOB)
+        sendAlert(`${Object.keys(oob).length} tile${Object.keys(oob).length === 1 ? "" : "s"} are out of bounds. They can be removed by pressing this button.`, button)
+    }
+}
+
 function renderAttributes() {
     if (!Object.keys(toolbarLookup).includes(activeItem)) {
         document.getElementById("attributes-section").innerHTML = "<h2>Level Editor</h2><p class=\"center\">Click on a tile to start drawing it.</p><p class=\"center\">Left Click - Draw</p> <p class=\"center\">Right Click - Erase</p>"
@@ -271,20 +330,24 @@ function renderAttributes() {
         input.type = item.inputType
         input.value = item.defaultVal
 
-        input.oninput = (item) => {
-            let legal = /[a-z]|[0-9]|[\s!@#$%^&*()\-_+=.?~`]/i
-            item.target.value = Array.from(item.target.value).filter((character) => {
-                    return legal.test(character)
-            }).join('')
+        if (toolbarLookup[activeItem].custom) {
+            input.oninput = (item) => {
+                let legal = /[a-z]|[0-9]|[\s!@#$%^&*()\-_+=.?~,'`]/i
+                item.target.value = Array.from(item.target.value).filter((character) => {
+                        return legal.test(character)
+                }).join('')
+            }
+        } else {
+            input.oninput = (item) => {
+                let legal = /[a-z]|[0-9]|[\s!@#$%^&*()\-_+=.?~'`]/i
+                item.target.value = Array.from(item.target.value).filter((character) => {
+                        return legal.test(character)
+                }).join('')
+            }
         }
+
         if (item.inputType !== "text") {
             input.size = 5
-        }
-        if (item.name === "Filename") {
-            input.value = backgroundFname
-            input.addEventListener("change", (event) => {
-                backgroundFname = event.target.value
-            })
         }
 
         input.className = "attribute"
@@ -338,13 +401,21 @@ function renderAttributes() {
 }
 
 function changeBackground(to) {
-    if (to === "Custom" || to === "Default") {
-        document.getElementById("background-options").style.display = to === "Custom" ? "block" : "none"
+    if (to.filename === "custom") {
+        document.getElementById("background-options").style.display = "block"
+        if (document.getElementById("bg-tiled").checked) {
+            document.getElementById("tile-controls").style.display = "block"
+        } else {
+            document.getElementById("tile-controls").style.display = "none"
+        }
     } else {
         document.getElementById("background-options").style.display = "none"
-        document.getElementById("bg-filename").value = to
-        document.getElementById("bg-tiled").checked = globalBackgrounds[to]
-        bgTiled = globalBackgrounds[to]
+        document.getElementById("bg-filename").value = to.filename
+        document.getElementById("bg-tiled").checked = to.tiled
+        if (to.tiled) {
+            document.getElementById("bg-col").value = to.col
+            document.getElementById("bg-row").value = to.row
+        }
     }
 }
 
@@ -385,14 +456,11 @@ function getSVGImageURL(name, color) {
 function setPlayerLocation(x=playerLocation[0], y=playerLocation[1]) {
     playerLocation = [x, y]
     if (x !== "" && y !== "") {
-        activeItem = "Player"
-        drawTile(x, y, toolbarLookup["Player"].image)
-        activeItem = ""
+        drawTile(x, y, "Player")
     }
 }
 
 function setActiveItem(event) {
-    // enableDrawing()
     let prevItem = activeItem
     let item = event.currentTarget
     if (document.getElementById("selector") != null) {
@@ -438,26 +506,6 @@ function importCustom(file) {
     }
 }
 
-function mouseDownEvent(event) {
-    event.preventDefault();
-    if (activeItem === "" || activeItem === "Customizer") {
-        return
-    }
-    if (activeItem === "Eraser") {
-        eraseEvent(event)
-        level.addEventListener("mouseover", eraseEvent)
-        return
-    }
-
-    if (event.button === 0) {
-        drawEvent(event)
-        level.addEventListener("mouseover", drawEvent)
-    } else if (event.button === 2) {
-        eraseEvent(event)
-        level.addEventListener("mouseover", eraseEvent)
-    }
-}
-
 function toggleCSVEditor(to) {
     if (to) {
         document.getElementById("csv-editor").style.display = "block"
@@ -479,7 +527,6 @@ function toggleCSVEditor(to) {
 function resetLevel() {
     failed = []
     resetCanvas()
-    board = Array(Number(document.getElementById("height").value)).fill("").map(() => Array(Number(document.getElementById("width").value)).fill(""))
     setPlayerLocation("", "")
     if (activeItem === "CSV Editor") {
         document.getElementById("level-visual").style.display = "none"
@@ -555,9 +602,7 @@ function csvToLevel(csv) {
             setPlayerLocation(width, height)
 
             if (lvl[1].split(',')[1] !== "" && lvl[1].split(',')[2] !== "") {
-                if (Number(width) * 4 === Math.floor(Number(width) * 4) && Number(height) * 4 === Math.floor(Number(height) * 4)) {
-                    board[height][width] = `,Player,${width},${height}`
-                } else {
+                if (Number(width) * 4 !== Math.floor(Number(width) * 4) || Number(height) * 4 !== Math.floor(Number(height) * 4)) {
                     sendAlert("Player start location parsed, but not located on a quarter tile. You will not be able to erase the tile outside of CSV mode.")
                 }
             }
@@ -568,19 +613,36 @@ function csvToLevel(csv) {
             document.getElementById("background-select").dispatchEvent(new Event("change"))
             contentStart = 2
         } else {
-            let bgFilename = lvl[2].split(',')[1].replace("\n","")
+            let bgTiled = lvl[2].split(',')[0] === "BackgroundTile"
+            let bgFilename = bgTiled ? lvl[2].split(',')[1].replace("\n","") : lvl[2].split(',').slice(1).join(',').replace("\n","")
+
             document.getElementById("bg-filename").value = bgFilename
-            document.getElementById("bg-tiled").checked = lvl[2].split(',')[0] === "BackgroundTile"
-            if (Object.keys(globalBackgrounds).includes(bgFilename)) {
-                document.getElementById("background-select").value = bgFilename
+            document.getElementById("bg-tiled").checked = bgTiled
+            let bg
+            if (bgTiled) {
+                let col = Number(lvl[2].split(',')[2].replace("\n",""))
+                let row = Number(lvl[2].split(',')[3].replace("\n",""))
+                document.getElementById("bg-col").value = col
+                document.getElementById("bg-row").value = row
+                bg = globalBackgrounds.find((bg2) => {
+                    return bg2.filename === bgFilename && bg2.tiled && bg2.col === col && bg2.row === row})
+            } else {
+                bg = globalBackgrounds.find((bg2) => {return bg2.filename === bgFilename && !bg2.tiled})
+            }
+
+            if (bg !== undefined) {
+                document.getElementById("background-select").value = bg.displayName
+                document.getElementById("background-select").dispatchEvent(new Event("change"))
+                activeBackground = bg
             } else {
                 document.getElementById("background-select").value = "Custom"
+                document.getElementById("background-select").dispatchEvent(new Event("change"))
+                activeBackground = customBackground
             }
-            document.getElementById("background-select").dispatchEvent(new Event("change"))
         }
 
         failed = []
-        decimals = []
+        let decimals = []
 
         for (let line of lvl.slice(contentStart)) {
             if (line !== "") {
@@ -618,7 +680,7 @@ function levelToCSV() {
     let lvlName = document.getElementById("name").value === "" ? "level" : document.getElementById("name").value
     let out = ""
     let startLocation = playerLocation
-    for (let [loc, entry] of Object.entries(levelMap)) {
+    for (let [_, entry] of Object.entries(levelMap)) {
         if (entry.split(',')[1] !== "Player") {
             out += entry
         }
@@ -629,16 +691,19 @@ function levelToCSV() {
     let bgName = document.getElementById("bg-filename").value
 
     if (document.getElementById("background-select").value === "Default") {
-        out = `${lvlTypePrettyName},${lvlName},${board[0].length},${board.length}\nPlayerStartLocation,${startLocation[0]},${startLocation[1]}\n` + out
+        out = `${lvlTypePrettyName},${lvlName},${lvlWidth},${lvlHeight}\nPlayerStartLocation,${startLocation[0]},${startLocation[1]}\n` + out
     } else {
-        out = `${lvlTypePrettyName},${lvlName},${board[0].length},${board.length}\nPlayerStartLocation,${startLocation[0]},${startLocation[1]}\n${bgTiled ? "BackgroundTile" : "BackgroundImage"},${bgName}\n` + out
+        let bgLine = document.getElementById("bg-tiled").checked ? "BackgroundTile" : "BackgroundImage"
+        bgLine += `,${bgName}`
+        if (document.getElementById("bg-tiled").checked) {
+            bgLine += `,${document.getElementById("bg-col").value},${document.getElementById("bg-row").value}`
+        }
+        out = `${lvlTypePrettyName},${lvlName},${lvlWidth},${lvlHeight}\nPlayerStartLocation,${startLocation[0]},${startLocation[1]}\n${bgLine}\n` + out
     }
     failed.forEach((line) => {out += `${line}\n`})
 
     return out
 }
-
-
 
 function exportLevel() {
     let out = ""
@@ -658,11 +723,15 @@ function exportLevel() {
     URL.revokeObjectURL(link.href)
 }
 
-function sendAlert(text) {
+function sendAlert(text, button=null, persistent=false) {
     let alert = document.createElement("div")
+    let alertContainer = document.getElementById("alert-container")
     alert.textContent = text
     alert.className = "alert"
-    document.getElementById("alert-container").prepend(alert)
+    alertContainer.prepend(alert)
+    if (alertContainer.children.length > 3) {
+        alertContainer.children[3].remove()
+    }
     let close = document.createElement("span")
     close.textContent = "×"
     close.onclick = () => {alert.remove()}
@@ -670,11 +739,18 @@ function sendAlert(text) {
     close.style.cursor = "pointer"
     alert.prepend(close)
 
-    setTimeout(() => {
-        alert.style.opacity = "0"
-    }, 5000)
+    if (button !== null) {
+        alert.append(button)
+    }
 
-    setTimeout(() => {
-        alert.remove()
-    }, 10000)
+    if (!persistent) {
+        setTimeout(() => {
+            alert.style.opacity = "0"
+        }, 5000)
+            setTimeout(() => {
+            alert.remove()
+        }, 10000)
+    }
+
+
 }

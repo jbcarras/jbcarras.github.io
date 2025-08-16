@@ -1,5 +1,4 @@
 let realCanvas
-let background = new Image()
 let levelMap = {}
 let gridScale = 1
 
@@ -14,7 +13,8 @@ let hoverEvent = () => {}
 let upEvent = () => {}
 
 function initCanvas() {
-    background = globalBackgrounds[activeBackground].image
+    let background = activeBackground.image
+
     if (background.complete) {
         resetCanvas()
     } else {
@@ -57,7 +57,7 @@ function enableDrawing() {
 
 function drawEvent(event) {
     let [x, y] = getTile(event)
-    drawTile(x, y, toolbarLookup[activeItem].image)
+    drawTile(x, y, activeItem)
 
 }
 
@@ -70,7 +70,7 @@ function toolHandler(event) {
         } else {
             playerLocation = [x, y]
         }
-        drawTile(x, y, toolbarLookup[activeItem].image)
+        drawTile(x, y, activeItem)
         setHoverEvent(toolHandler)
         setMouseUpEvent(() => setHoverEvent(() => {}))
         redrawCanvas()
@@ -101,7 +101,7 @@ function mouseDownEvent(event) {
     }
     if (event.button === 0) {
         let [x, y] = getTile(event)
-        drawTile(x, y, toolbarLookup[activeItem].image)
+        drawTile(x, y, activeItem)
         setHoverEvent(drawEvent)
         setMouseUpEvent(() => setHoverEvent(() => {}))
 
@@ -138,18 +138,23 @@ function getTile(event) {
 }
 
 function drawTile(x, y, tile) {
-    if ([x,y] in levelMap && levelMap[[x, y]].split(',')[1] === activeItem) {
+    if ([x,y] in levelMap && levelMap[[x, y]].split(',')[1] === tile) {
         return
     }
 
-    if (tile.complete) {
-        let parent = toolbarLookup[activeItem].parent
-        let name = toolbarLookup[activeItem].name
+    if (!(tile in toolbarLookup)) {
+        sendAlert(`Attempted to draw an invalid tile \"${tile}\". If this wasn't your fault, please report it.`)
+        return
+    }
+
+    if (toolbarLookup[tile].image.complete) {
+        let parent = toolbarLookup[tile].parent
+        let name = toolbarLookup[tile].name
         const attributes = document.getElementsByClassName("attribute").length !== 0 && !(toolbarLookup[activeItem].custom && document.getElementById("Attributes").value.length === 0) ? "," + Array.from(document.getElementsByClassName("attribute")).map((element) => element.value).reduce((a, b) => a + "," + b) : ""
         levelMap[[x, y]] = `${parent},${name},${x},${y}${attributes}\n`
         redrawCanvas()
     } else {
-        tile.onload = () => {
+        toolbarLookup[tile].image.onload = () => {
             drawTile(x, y, tile)
         }
     }
@@ -184,19 +189,28 @@ function redrawCanvas() {
 
     context.scale(scaleFactor, scaleFactor)
 
-    if (!(activeBackground in globalBackgrounds)) {
-        for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    context.drawImage(background, x * 128, y * 128, 128, 128)
-                 }
-            }
-    } else {
+    if (activeBackground.tiled) {
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
-                context.drawImage(globalBackgrounds[activeBackground].image, x * 128, y * 128, 128, 128)
-             }
+                context.drawImage(activeBackground.image, x * 128, y * 128, 128, 128)
+            }
         }
+    } else {
+        let imgHOffset = 0
+        let imgVOffset = 0
+
+        while (imgVOffset < realCanvas.height * 16) {
+            while (imgHOffset < realCanvas.width * 16) {
+                context.drawImage(activeBackground.image, imgHOffset, imgVOffset, activeBackground.image.width, activeBackground.image.height)
+                imgHOffset += activeBackground.image.width
+            }
+            imgVOffset += activeBackground.image.height
+            imgHOffset = 0
+        }
+
+
     }
+
 
     for (let [loc, csv] of Object.entries(levelMap)) {
         let x = loc.split(',')[0]
@@ -234,6 +248,7 @@ function redrawCanvas() {
 
     document.getElementById("level-container").append(realCanvas)
 }
+
 
 function drawGrid(context, x, y) {
     let thickness = 2 / (document.getElementById("zoom").value / 25)
