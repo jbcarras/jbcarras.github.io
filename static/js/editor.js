@@ -139,8 +139,8 @@ function initEditor() {
         }).then(() => {initCanvas(); resetCanvas()
         }).then(() => resetLevel())
 
-    if (!localStorage.getItem("seen-new-editor-warning")) {
-        localStorage.setItem("seen-new-editor-warning", true)
+    if (Number(localStorage.getItem("seen-new-editor-warning")) < 1) {
+        localStorage.setItem("seen-new-editor-warning", 1)
         const oldBtn = document.createElement("button")
         oldBtn.textContent = "Use Old Editor"
         oldBtn.addEventListener("click", () => {

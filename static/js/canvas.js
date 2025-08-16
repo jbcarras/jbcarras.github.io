@@ -196,17 +196,29 @@ function redrawCanvas() {
             }
         }
     } else {
-        let imgHOffset = 0
-        let imgVOffset = 0
-
-        while (imgVOffset < realCanvas.height * 16) {
-            while (imgHOffset < realCanvas.width * 16) {
-                context.drawImage(activeBackground.image, imgHOffset, imgVOffset, activeBackground.image.width, activeBackground.image.height)
-                imgHOffset += activeBackground.image.width
-            }
-            imgVOffset += activeBackground.image.height
-            imgHOffset = 0
+        if (localStorage.getItem("seen-new-editor-warning") !== "2") {
+            sendAlert("I thought this worked but apparently it just crashes your browser usually? So no for now. I'll fix it like later today or tomorrow or something. oops.")
+            localStorage.setItem("seen-new-editor-warning", 2)
         }
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                context.drawImage(defaultBackground.image, x * 128, y * 128, 128, 128)
+            }
+        }
+
+
+        // let imgHOffset = 0
+        // let imgVOffset = 0
+        //
+        // while (imgVOffset < realCanvas.height * 16) {
+        //     while (imgHOffset < realCanvas.width * 16) {
+        //         context.drawImage(activeBackground.image, imgHOffset, imgVOffset, activeBackground.image.width, activeBackground.image.height)
+        //         imgHOffset += activeBackground.image.width
+        //     }
+        //     imgVOffset += activeBackground.image.height
+        //     imgHOffset = 0
+        // }
 
 
     }
