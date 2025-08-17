@@ -21,9 +21,9 @@ class Item {
 }
 
 class Background {
-    constructor(filename, imageFilename, tiled, col=undefined, row=undefined) {
+    constructor(displayName, filename, imageFilename, tiled, col=undefined, row=undefined) {
+        this.displayName = displayName
         this.filename = filename
-        this.displayName = imageFilename.split("/")[imageFilename.split("/").length-1].split(".")[0]
         this.tiled = tiled
         this.image = new Image()
         this.image.src = `${imageFilename}`
@@ -32,10 +32,6 @@ class Background {
         if (this.tiled) {
             this.image.width = 128
             this.image.height = 128
-            this.displayName = `${this.displayName} (${this.col}, ${this.row})`
-        } else {
-            this.image.width *= 8
-            this.image.height *= 8
         }
     }
 }
@@ -63,8 +59,8 @@ let types = {}
 let globalBackgrounds = []
 let bgMap = {}
 
-const defaultBackground = new Background("default", "static/tiles/Grass.png", true)
-const customBackground = new Background("custom", "static/tiles/Grass.png", true)
+const defaultBackground = new Background("default", "default", "static/tiles/Grass.png", true)
+const customBackground = new Background("custom", "custom", "static/tiles/Grass.png", true)
 
 
 let activeBackground = defaultBackground
@@ -139,24 +135,24 @@ function initEditor() {
         }).then(() => {initCanvas(); resetCanvas()
         }).then(() => resetLevel())
 
-    if (Number(localStorage.getItem("seen-new-editor-warning")) < 1) {
-        localStorage.setItem("seen-new-editor-warning", 1)
+    if (!localStorage.getItem("seen-new-editor-warning")) {
+        localStorage.setItem("seen-new-editor-warning", true)
         const oldBtn = document.createElement("button")
         oldBtn.textContent = "Use Old Editor"
         oldBtn.addEventListener("click", () => {
             window.location.href = "/legacy-editor.html"
         })
 
-        sendAlert("Old editor will be removed very soon. Also this warning won't show ever again.", oldBtn, true)
+        sendAlert("Old editor will be removed very soon. Also this warning won't show again.", oldBtn, true)
     }
 }
 
 function initBackgrounds(backgrounds) {
     let selector = document.getElementById("background-select")
     for (let background of backgrounds) {
-        let bg = new Background(background["engineFilename"], background["localFilename"], background["tiled"])
+        let bg = new Background(background["displayName"], background["engineFilename"], background["localFilename"], background["tiled"])
         if (background["tiled"]) {
-            bg = new Background(background["engineFilename"], background["localFilename"], background["tiled"], background["col"], background["row"])
+            bg = new Background(background["displayName"], background["engineFilename"], background["localFilename"], background["tiled"], background["col"], background["row"])
             bgMap[bg.displayName] = bg
             globalBackgrounds.push(bg)
         } else {

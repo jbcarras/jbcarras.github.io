@@ -1,11 +1,42 @@
 {
   "tasks": ["Task 1", "Task 2", "Task 3", "Task 4", "Task 5", "Task 6", "Bonus", "Mario"],
   "types": {"topdown": "TopDownLevel", "platformer": "PlatformerLevel", "openworld": "OpenWorldLevel", "sidescroller":  "SideScrollerLevel"},
-  "backgrounds": [{"localFilename": "static/tiles/Grass.png", "engineFilename": "MiniWorldSprites/Ground/Grass.png","tiled": true,"col": 2,"row": 0},
-    {"localFilename": "static/backgrounds/smb_background.png", "engineFilename": "mario/smb_background.png","tiled":false},
-  {"localFilename": "static/tiles/GrassBlue.png", "engineFilename": "MiniWorldSprites/Ground/Grass.png", "tiled": true, "col": 0,"row": 0},
-    {"localFilename": "static/backgrounds/mountains_1.png", "engineFilename": "mountains/mountains_1/1.png,mountains/mountains_1/2.png,mountains/mountains_1/3.png,mountains/mountains_1/4.png,mountains/mountains_1/5.png","tiled":false},
-  {"localFilename": "static/backgrounds/peaks_1.png", "engineFilename": "peaks/peaks_1/1.png,peaks/peaks_1/2.png,peaks/peaks_1/3.png,peaks/peaks_1/4.png,peaks/peaks_1/5.png","tiled":false}],
+  "backgrounds": [
+    {
+      "displayName": "Grass.png (2, 0)",
+      "localFilename": "static/tiles/Grass.png",
+      "engineFilename": "MiniWorldSprites/Ground/Grass.png",
+      "tiled": true,
+      "col": 2,
+      "row": 0
+    },
+    {
+      "displayName": "smb_background.png",
+      "localFilename": "static/backgrounds/smb_background.png",
+      "engineFilename": "mario/smb_background.png",
+      "tiled":false
+    },
+    {
+      "displayName": "Grass.png (0, 0)",
+      "localFilename": "static/tiles/GrassBlue.png",
+      "engineFilename": "MiniWorldSprites/Ground/Grass.png",
+      "tiled": true,
+      "col": 0,
+      "row": 0
+    },
+    {
+      "displayName" : "mountains_1",
+      "localFilename": "static/backgrounds/mountains_1.png",
+      "engineFilename": "mountains/mountains_1/1.png,mountains/mountains_1/2.png,mountains/mountains_1/3.png,mountains/mountains_1/4.png,mountains/mountains_1/5.png",
+      "tiled":false
+    },
+    {
+      "displayName": "peaks_1",
+      "localFilename": "static/backgrounds/peaks_1.png",
+      "engineFilename": "peaks/peaks_1/1.png,peaks/peaks_1/2.png,peaks/peaks_1/3.png,peaks/peaks_1/4.png,peaks/peaks_1/5.png",
+      "tiled":false
+    }
+  ],
   "items": {
     "Wall": {
       "description": "A wall for top-down levels.",
