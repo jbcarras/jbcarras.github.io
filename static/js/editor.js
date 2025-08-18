@@ -775,6 +775,4 @@ function sendAlert(text, button=null, persistent=false) {
             alert.remove()
         }, 10000)
     }
-
-
 }

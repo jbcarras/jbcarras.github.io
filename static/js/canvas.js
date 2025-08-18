@@ -88,7 +88,7 @@ function toolHandler(event) {
             let [x, y] = getTile(event)
             removeTile(x, y)
             document.getElementById("level-visual").addEventListener("mousemove", eraseEvent)
-            hoverEvent = eraseEvent
+            setHoverEvent(eraseEvent)
             setMouseUpEvent(() => setHoverEvent(() => {}))
         }
 
@@ -107,11 +107,11 @@ function toolHandler(event) {
 function eraseEvent(event) {
     let [x, y] = getTile(event)
     removeTile(x, y)
-    document.getElementById("level-visual").removeEventListener("mousemove", drawEvent)
 }
 
 function mouseDownEvent(event) {
     lastStroke = []
+    redoActions = []
     if (!(activeItem in toolbarLookup)) {
         return
     }
@@ -137,7 +137,7 @@ function mouseDownEvent(event) {
 
             eraseEvent(event);
         })
-        hoverEvent = eraseEvent
+        setHoverEvent(eraseEvent)
         setMouseUpEvent(() => { setHoverEvent(() => {}); rememberUndo(lastStroke); lastStroke = [] })
     }
 }
@@ -227,11 +227,12 @@ function redoAction() {
 }
 
 function undoEvent(event) {
-    event.preventDefault()
     if (event.ctrlKey && event.key === "z") {
+        event.preventDefault()
         undoAction()
         redrawCanvas()
     } else if (event.ctrlKey && event.key === "y") {
+        event.preventDefault()
         redoAction()
         redrawCanvas()
     }
