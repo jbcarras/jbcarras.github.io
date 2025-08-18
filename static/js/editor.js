@@ -38,14 +38,20 @@ class Background {
     }
 }
 
+const playerDesc = "Draw where the player appears when the level is loaded."
+
+let defaultPlayer = new Item("Player", playerDesc, "", [], "static/tiles/Player.png", 0, ["topdown", "platformer"], "1x1",[], false)
+
 const tools = {
     "Eraser": new Item("Eraser", "Erase tiles you previously drew.", "", [], "static/tiles/Eraser.png", 0, ["topdown", "platformer"], "1x1",[], false),
-    "Player": new Item("Player", "Draw where the player appears when the level is loaded.", "", [], "static/tiles/Player.png", 0, ["topdown", "platformer"], "1x1",[], false),
+    "Player": defaultPlayer,
     "Customizer": new Item("Customizer", "Create and manage custom tiles.", "", [], "static/tiles/Custom.png", 0, ["topdown", "platformer"], "1x1",[], false),
     "CSV Editor": new Item("CSV Editor", "Manually edit the level's CSV output.", "", [], "static/tiles/BackgroundTool.png", 0, ["topdown", "platformer"], "1x1",[], false),
 }
 
 let toolbarLookup = {...tools}
+
+let players = {}
 
 let items = {}
 
@@ -113,18 +119,20 @@ function initEditor() {
     const typeSelect = document.getElementById("type")
     typeSelect.addEventListener("change", () => {
         type = typeSelect.value
-        renderToolbar()
         if (activeItem === "" || !toolbarLookup[activeItem].allowedTypes.includes(type)) {
             activeItem = ""
         }
         if (type === "custom") {
             document.getElementById("custom-type-container").style.display = "block"
+            setPlayer(defaultPlayer)
         } else {
             document.getElementById("custom-type-container").style.display = "none"
-            document.getElementById("type-name").value = types[type]
+            document.getElementById("type-name").value = types[type].name
+            setPlayer(players[type])
         }
-
+        renderToolbar()
         renderAttributes()
+        redrawCanvas()
     })
     fetch("static/editor.json").then(
         (response) => {
@@ -137,17 +145,6 @@ function initEditor() {
         renderToolbar()
         }).then(() => {initCanvas(); resetCanvas()
         }).then(() => resetLevel())
-
-    if (!localStorage.getItem("seen-new-editor-warning")) {
-        localStorage.setItem("seen-new-editor-warning", true)
-        const oldBtn = document.createElement("button")
-        oldBtn.textContent = "Use Old Editor"
-        oldBtn.addEventListener("click", () => {
-            window.location.href = "/old"
-        })
-
-        sendAlert("Old editor will be removed very soon. Also this warning won't show again.", oldBtn, true)
-    }
 }
 
 function initBackgrounds(backgrounds) {
@@ -211,20 +208,30 @@ function initTasks(tasks) {
 
 function initTypes(loadedTypes) {
     types = loadedTypes
+    defaultPlayer.allowedTypes = Object.keys(types)
     let dropdown = document.getElementById("type")
-    for ([id, prettyName] of Object.entries(loadedTypes)) {
+    for ([id, typeInfo] of Object.entries(loadedTypes)) {
         let type = document.createElement("option")
         type.value = id
-        type.textContent = prettyName
+        type.textContent = typeInfo["name"]
         dropdown.append(type)
+        players[id] = new Item("Player", playerDesc, "", [], typeInfo["playerSprite"], 0, Object.keys(types), `${typeInfo["playerWidth"]}x${typeInfo["playerHeight"]}`)
     }
     let opt = document.createElement("option")
         opt.value = "custom"
         opt.textContent = "Custom"
         dropdown.append(opt)
     type = dropdown.children[0].value
-    document.getElementById("type-name").value = types[type]
+    document.getElementById("type-name").value = types[type].name
     dropdown.children[0].selected = true
+    Object.keys(tools).forEach((tool) => {tools[tool].allowedTypes = Object.keys(types).concat("custom")})
+}
+
+function setPlayer(player) {
+    tools["Player"] = player
+    toolbarLookup["Player"] = player
+    document.getElementById("player-button").style.backgroundImage = `url(${player.url})`
+    redrawCanvas()
 }
 
 function initItems(loadedItems) {
@@ -575,18 +582,19 @@ function csvToLevel(csv) {
     try {
         const lvl = csv.split("\n")
         const typeSelect = document.getElementById("type")
-        const selType = Object.keys(types).find((type) => {return types[type] === lvl[0].split(',')[0]})
+        const selType = Object.keys(types).find((type) => {return types[type].name === lvl[0].split(',')[0]})
         if (selType !== undefined) {
             typeSelect.value = selType
             type = selType
             document.getElementById("custom-type-container").style.display = "none"
-            document.getElementById("type-name").value = types[selType]
+            document.getElementById("type-name").value = types[selType].name
         } else {
             typeSelect.value = "custom"
             type = "custom"
             document.getElementById("custom-type-container").style.display = "block"
             document.getElementById("type-name").value = lvl[0].split(',')[0]
         }
+        typeSelect.dispatchEvent(new Event("change"))
         document.getElementById("name").value = lvl[0].split(',')[1]
         document.getElementById("width").value = lvl[0].split(',')[2]
         document.getElementById("height").value = lvl[0].split(',')[3]

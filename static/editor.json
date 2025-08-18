@@ -1,6 +1,49 @@
 {
   "tasks": ["Task 1", "Task 2", "Task 3", "Task 4", "Task 5", "Task 6", "Bonus", "Mario"],
-  "types": {"topdown": "TopDownLevel", "platformer": "PlatformerLevel", "openworld": "OpenWorldLevel", "sidescroller":  "SideScrollerLevel", "mario": "MarioLevel"},
+  "types": {
+    "topdown": {
+      "name": "TopDownLevel",
+      "playerSprite": "static/tiles/Player.png",
+      "playerWidth": 1,
+      "playerHeight": 1
+    },
+    "platformer": {
+      "name": "PlatformerLevel",
+      "playerSprite": "static/tiles/Player.png",
+      "playerWidth": 1,
+      "playerHeight": 1
+    },
+    "openworld": {
+      "name": "OpenWorldLevel",
+      "playerSprite": "static/tiles/Player.png",
+      "playerWidth": 1,
+      "playerHeight": 1
+    },
+    "sidescroller": {
+      "name": "SideScrollerLevel",
+      "playerSprite": "static/tiles/Player.png",
+      "playerWidth": 1,
+      "playerHeight": 1
+    },
+    "mario": {
+      "name": "MarioLevel",
+      "playerSprite": "static/tiles/Mario.png",
+      "playerWidth": 1,
+      "playerHeight": 1
+    },
+    "test1": {
+      "name": "Test (Taller Player)",
+      "playerSprite": "static/tiles/Turtle.png",
+      "playerWidth": 1,
+      "playerHeight": 1.5
+    },
+    "test2": {
+      "name": "Test (Wider Player)",
+      "playerSprite": "static/tiles/PipeEnd.png",
+      "playerWidth": 2,
+      "playerHeight": 1
+    }
+  },
   "backgrounds": [
     {
       "displayName": "Grass.png (2, 0)",

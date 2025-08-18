@@ -62,18 +62,27 @@ function drawEvent(event) {
 }
 
 function toolHandler(event) {
-    if (activeItem === "Player" && !(getTile(event)[0] === playerLocation[0] && getTile(event)[1] === playerLocation[1])) {
-        let [x, y] = getTile(event)
-        if (playerLocation in levelMap) {
-            delete levelMap[playerLocation]
+    if (activeItem === "Player" ) {
+
+        if (event.button === 0 && !(getTile(event)[0] === playerLocation[0] && getTile(event)[1] === playerLocation[1])) {
+            let [x, y] = getTile(event)
+            if (playerLocation in levelMap) {
+                delete levelMap[playerLocation]
+            }
+            drawTile(x, y, activeItem)
             playerLocation = [x, y]
-        } else {
-            playerLocation = [x, y]
+            setHoverEvent(toolHandler)
+            setMouseUpEvent(() => setHoverEvent(() => {}))
+            redrawCanvas()
+        } else if (event.button !== 0) {
+            let [x, y] = getTile(event)
+            removeTile(x, y)
+            document.getElementById("level-visual").addEventListener("mousemove", eraseEvent)
+            hoverEvent = eraseEvent
+            setMouseUpEvent(() => setHoverEvent(() => {}))
         }
-        drawTile(x, y, activeItem)
-        setHoverEvent(toolHandler)
-        setMouseUpEvent(() => setHoverEvent(() => {}))
-        redrawCanvas()
+
+
     }
 
     if (activeItem === "Eraser") {
@@ -152,6 +161,10 @@ function drawTile(x, y, tile) {
         return
     }
 
+    if ([x,y] in levelMap && x === Number(playerLocation[0]) && y === Number(playerLocation[1])) {
+        playerLocation = ["", ""]
+    }
+
     if (!(tile in toolbarLookup)) {
         sendAlert(`Attempted to draw an invalid tile \"${tile}\". If this wasn't your fault, please report it.`)
         return
@@ -172,6 +185,10 @@ function drawTile(x, y, tile) {
 }
 
 function removeTile(x, y) {
+    if ([x,y] in levelMap && x === Number(playerLocation[0]) && y === Number(playerLocation[1])) {
+        playerLocation = ["", ""]
+    }
+
     delete levelMap[[x, y]]
     redrawCanvas()
 }
