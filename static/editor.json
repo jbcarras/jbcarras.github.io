@@ -1,6 +1,6 @@
 {
   "tasks": ["Task 1", "Task 2", "Task 3", "Task 4", "Task 5", "Task 6", "Bonus", "Mario"],
-  "types": {"topdown": "TopDownLevel", "platformer": "PlatformerLevel", "openworld": "OpenWorldLevel", "sidescroller":  "SideScrollerLevel"},
+  "types": {"topdown": "TopDownLevel", "platformer": "PlatformerLevel", "openworld": "OpenWorldLevel", "sidescroller":  "SideScrollerLevel", "mario": "MarioLevel"},
   "backgrounds": [
     {
       "displayName": "Grass.png (2, 0)",
@@ -44,7 +44,8 @@
       "attributes": [],
       "url": "static/tiles/Wall.png",
       "task": 1,
-      "allowedTypes": ["topdown", "openworld"]
+      "allowedTypes": ["topdown", "openworld"],
+      "dimension": "1x1"
     },
     "PlatformerWall": {
       "description": "A wall for platformer levels. Accounts for gravity.",
@@ -52,7 +53,8 @@
       "attributes": [],
       "url": "static/tiles/PlatformerWall.png",
       "task": 3,
-      "allowedTypes": ["platformer","sidescroller"]
+      "allowedTypes": ["platformer","sidescroller"],
+      "dimension": "1x1"
     },
     "Demon": {
       "description": "Harms the player. May be able to move.",
@@ -63,7 +65,8 @@
       ],
       "url": "static/tiles/Enemy.png",
       "task": 1,
-      "allowedTypes": ["topdown", "openworld"]
+      "allowedTypes": ["topdown", "openworld"],
+      "dimension": "1x1"
     },
     "AxePickup": {
       "description": "A slow-moving but strong projectile.",
@@ -71,7 +74,8 @@
       "attributes": [],
       "url": "static/tiles/Axe.png",
       "task": 5,
-      "allowedTypes": ["topdown", "openworld"]
+      "allowedTypes": ["topdown", "openworld"],
+      "dimension": "1x1"
     },
     "Goal": {
       "description": "Calls advanceLevel() when a Player collides.",
@@ -79,7 +83,8 @@
       "attributes": [],
       "url": "static/tiles/Goal.png",
       "task": 1,
-      "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
+      "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"],
+      "dimension": "1x1"
     },
     "Potion": {
       "description": "A potion that heals players who come in contact.",
@@ -89,7 +94,8 @@
       ],
       "url": "static/tiles/RedPotion.png",
       "task": 3,
-      "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
+      "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"],
+      "dimension": "1x1"
     },
     "PotionPickup": {
       "description": "A potion that gets stored in a player's inventory to be consumed later.",
@@ -99,7 +105,8 @@
       ],
       "url": "static/tiles/BluePotion.png",
       "task": 5,
-      "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
+      "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"],
+      "dimension": "1x1"
     },
     "Tower": {
       "description": "An indestructible and immobile enemy tower.",
@@ -107,7 +114,8 @@
       "attributes": [],
       "url": "static/tiles/Tower.png",
       "task": 1,
-      "allowedTypes": ["topdown", "openworld"]
+      "allowedTypes": ["topdown", "openworld"],
+      "dimension": "1x1"
     },
     "MagicPickup": {
       "description": "A fast but weaker projectile.",
@@ -115,7 +123,8 @@
       "attributes": [],
       "url": "static/tiles/Magic.png",
       "task": 5,
-      "allowedTypes": ["topdown", "openworld"]
+      "allowedTypes": ["topdown", "openworld"],
+      "dimension": "1x1"
     },
     "Spike": {
       "description": "A fatal obstacle.",
@@ -123,7 +132,8 @@
       "attributes": [],
       "url": "static/tiles/Spike.png",
       "task": 3,
-      "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
+      "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"],
+      "dimension": "1x1"
     },
     "Minotaur": {
       "description": "A smarter enemy that hunts the player down, avoiding walls.",
@@ -134,7 +144,8 @@
       ],
       "url": "static/tiles/SmartEnemy.png",
       "task": 6,
-      "allowedTypes": ["topdown", "openworld"]
+      "allowedTypes": ["topdown", "openworld"],
+      "dimension": "1x1"
     },
     "Archer": {
       "description": "An enemy who fires harmful arrows at the player.",
@@ -144,7 +155,8 @@
         {"name": "Strength", "defaultVal": 1, "inputType": "number"}],
       "url": "static/tiles/Archer.png",
       "task": 7,
-      "allowedTypes": ["topdown", "openworld"]
+      "allowedTypes": ["topdown", "openworld"],
+      "dimension": "1x1"
     },
     "PushWall": {
       "description": "A wall that gets pushed when collided with.",
@@ -152,7 +164,8 @@
       "attributes": [],
       "url": "static/tiles/PushWall.png",
       "task": 7,
-      "allowedTypes": ["topdown","openworld"]
+      "allowedTypes": ["topdown","openworld"],
+      "dimension": "1x1"
     },
     "Platform": {
       "description": "A platform that can be jumped through.",
@@ -160,7 +173,8 @@
       "attributes": [],
       "url": "static/tiles/Platform.png",
       "task": 7,
-      "allowedTypes": ["platformer","sidescroller"]
+      "allowedTypes": ["platformer","sidescroller"],
+      "dimension": "1x1"
     },
     "Ledge": {
       "description": "A barrier that can be walked through from above, but not below.",
@@ -173,7 +187,8 @@
       ],
       "url": "static/tiles/Ledge.png",
       "task": 7,
-      "allowedTypes": ["topdown","openworld"]
+      "allowedTypes": ["topdown","openworld"],
+      "dimension": "1x1"
     },
     "InfoNode": {
       "description": "An interactable object that displays text.",
@@ -183,7 +198,8 @@
       ],
       "url": "static/tiles/InfoNode.png",
       "task": 7,
-      "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"]
+      "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"],
+      "dimension": "1x1"
     },
     "Horse": {
       "description": "Immovable horse of destruction.",
@@ -191,7 +207,8 @@
       "attributes": [],
       "url": "static/tiles/Horse.png",
       "task": 7,
-      "allowedTypes": ["topdown", "openworld"]
+      "allowedTypes": ["topdown", "openworld"],
+      "dimension": "1x1"
     },
     "QuestionBlock": {
       "description": "",
@@ -199,7 +216,8 @@
       "attributes": [],
       "url": "static/tiles/QuestionBlock.png",
       "task": 8,
-      "allowedTypes": ["sidescroller"]
+      "allowedTypes": ["mario"],
+      "dimension": "1x1"
     },
     "Block": {
       "description": "",
@@ -207,39 +225,26 @@
       "attributes": [],
       "url": "static/tiles/Block.png",
       "task": 8,
-      "allowedTypes": ["sidescroller"]
+      "allowedTypes": ["mario"],
+      "dimension": "1x1"
     },
-    "UpPipeLeft": {
+    "PipeEnd": {
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "static/tiles/UpPipeLeft.png",
+      "url": "static/tiles/PipeEnd.png",
       "task": 8,
-      "allowedTypes": ["sidescroller"]
+      "allowedTypes": ["mario"],
+      "dimension": "2x1"
     },
-    "UpPipeRight": {
+    "PipeStem": {
       "description": "",
       "parent": "StaticGameObject",
       "attributes": [],
-      "url": "static/tiles/UpPipeRight.png",
+      "url": "static/tiles/PipeStem.png",
       "task": 8,
-      "allowedTypes": ["sidescroller"]
-    },
-    "UpPipeTopLeft": {
-      "description": "",
-      "parent": "StaticGameObject",
-      "attributes": [],
-      "url": "static/tiles/UpPipeTopLeft.png",
-      "task": 8,
-      "allowedTypes": ["sidescroller"]
-    },
-    "UpPipeTopRight": {
-      "description": "",
-      "parent": "StaticGameObject",
-      "attributes": [],
-      "url": "static/tiles/UpPipeTopRight.png",
-      "task": 8,
-      "allowedTypes": ["sidescroller"]
+      "allowedTypes": ["mario"],
+      "dimension": "2x1"
     },
     "HiddenBlock": {
       "description": "",
@@ -247,7 +252,8 @@
       "attributes": [],
       "url": "static/tiles/Selector.png",
       "task": 8,
-      "allowedTypes": ["sidescroller"]
+      "allowedTypes": ["mario"],
+      "dimension": "1x1"
     },
     "Bricks": {
       "description": "",
@@ -255,7 +261,8 @@
       "attributes": [],
       "url": "static/tiles/Bricks.png",
       "task": 8,
-      "allowedTypes": ["sidescroller"]
+      "allowedTypes": ["mario"],
+      "dimension": "1x1"
     },
     "Ground": {
       "description": "",
@@ -263,7 +270,8 @@
       "attributes": [],
       "url": "static/tiles/Ground.png",
       "task": 8,
-      "allowedTypes": ["sidescroller"]
+      "allowedTypes": ["mario"],
+      "dimension": "1x1"
     },
     "Flag": {
       "description": "",
@@ -271,7 +279,8 @@
       "attributes": [],
       "url": "static/tiles/Flag.png",
       "task": 8,
-      "allowedTypes": ["sidescroller"]
+      "allowedTypes": ["mario"],
+      "dimension": "1x1"
     },
     "Flagpole": {
       "description": "",
@@ -279,7 +288,8 @@
       "attributes": [],
       "url": "static/tiles/Flagpole.png",
       "task": 8,
-      "allowedTypes": ["sidescroller"]
+      "allowedTypes": ["mario"],
+      "dimension": "1x1"
     },
     "FlagTip": {
       "description": "",
@@ -287,7 +297,8 @@
       "attributes": [],
       "url": "static/tiles/FlagTip.png",
       "task": 8,
-      "allowedTypes": ["sidescroller"]
+      "allowedTypes": ["mario"],
+      "dimension": "1x1"
     },
     "FlagTop": {
       "description": "",
@@ -295,7 +306,8 @@
       "attributes": [],
       "url": "static/tiles/FlagTop.png",
       "task": 8,
-      "allowedTypes": ["sidescroller"]
+      "allowedTypes": ["mario"],
+      "dimension": "1x1"
     },
     "Goomba": {
       "description": "",
@@ -303,15 +315,17 @@
       "attributes": [],
       "url": "static/tiles/Goomba.png",
       "task": 8,
-      "allowedTypes": ["sidescroller"]
+      "allowedTypes": ["mario"],
+      "dimension": "1x1"
     },
-    "Turtle": {
+    "Koopa": {
       "description": "",
       "parent": "DynamicGameObject",
       "attributes": [],
       "url": "static/tiles/Turtle.png",
       "task": 8,
-      "allowedTypes": ["sidescroller"]
+      "allowedTypes": ["mario"],
+      "dimension": "1x1.5"
     },
     "BuzzyBeetle": {
       "description": "",
@@ -319,15 +333,8 @@
       "attributes": [],
       "url": "static/tiles/BuzzyBeetle.png",
       "task": 8,
-      "allowedTypes": ["sidescroller"]
-    },
-    "Mario": {
-      "description": "",
-      "parent": "DynamicGameObject",
-      "attributes": [],
-      "url": "static/tiles/Mario.png",
-      "task": 8,
-      "allowedTypes": ["sidescroller"]
+      "allowedTypes": ["mario"],
+      "dimension": "1x1"
     }
   }
 }

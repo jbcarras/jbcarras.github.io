@@ -1,7 +1,7 @@
 const randomColors = ["#F94144", "#F3722C", "#F8961E", "#F9C74F", "#90BE6D", "#43AA8B", "#577590"]
 
 class Item {
-    constructor(name, description, parent, attributes, url, task, allowedTypes, alternatives=[], custom=false, color=randomColors[Math.floor(Math.random() * randomColors.length)]) {
+    constructor(name, description, parent, attributes, url, task, allowedTypes, dimension, alternatives=[], custom=false, color=randomColors[Math.floor(Math.random() * randomColors.length)]) {
         this.name = name
         this.description = description
         this.parent = parent
@@ -10,6 +10,8 @@ class Item {
         this.task = Number(task)
         this.allowedTypes = allowedTypes
         this.alternatives = alternatives
+        this.width = Number(dimension.split("x")[0])
+        this.height = Number(dimension.split("x")[1])
         this.image = new Image()
         this.custom = custom
         if (!this.custom) {
@@ -37,10 +39,10 @@ class Background {
 }
 
 const tools = {
-    "Eraser": new Item("Eraser", "Erase tiles you previously drew.", "", [], "static/tiles/Eraser.png", 0, ["topdown", "platformer"], [], false),
-    "Player": new Item("Player", "Draw where the player appears when the level is loaded.", "", [], "static/tiles/Player.png", 0, ["topdown", "platformer"], [], false),
-    "Customizer": new Item("Customizer", "Create and manage custom tiles.", "", [], "static/tiles/Custom.png", 0, ["topdown", "platformer"], [], false),
-    "CSV Editor": new Item("CSV Editor", "Manually edit the level's CSV output.", "", [], "static/tiles/BackgroundTool.png", 0, ["topdown", "platformer"], [], false),
+    "Eraser": new Item("Eraser", "Erase tiles you previously drew.", "", [], "static/tiles/Eraser.png", 0, ["topdown", "platformer"], "1x1",[], false),
+    "Player": new Item("Player", "Draw where the player appears when the level is loaded.", "", [], "static/tiles/Player.png", 0, ["topdown", "platformer"], "1x1",[], false),
+    "Customizer": new Item("Customizer", "Create and manage custom tiles.", "", [], "static/tiles/Custom.png", 0, ["topdown", "platformer"], "1x1",[], false),
+    "CSV Editor": new Item("CSV Editor", "Manually edit the level's CSV output.", "", [], "static/tiles/BackgroundTool.png", 0, ["topdown", "platformer"], "1x1",[], false),
 }
 
 let toolbarLookup = {...tools}
@@ -91,6 +93,7 @@ function initEditor() {
     document.getElementById("player-button").addEventListener("click", (event) => setActiveItem(event))
     document.getElementById("custom-button").addEventListener("click", (event) => setActiveItem(event))
     document.getElementById("csv-button").addEventListener("click", (event) => setActiveItem(event))
+    document.getElementById("hints").value = "ambiguous"
     const reset = document.getElementById("reset")
     reset.addEventListener("click", resetLevel)
 
@@ -140,7 +143,7 @@ function initEditor() {
         const oldBtn = document.createElement("button")
         oldBtn.textContent = "Use Old Editor"
         oldBtn.addEventListener("click", () => {
-            window.location.href = "/legacy-editor.html"
+            window.location.href = "/old"
         })
 
         sendAlert("Old editor will be removed very soon. Also this warning won't show again.", oldBtn, true)
@@ -230,11 +233,11 @@ function initItems(loadedItems) {
         if ("alternatives" in itemEntry) {
             items[item] = new Item(item, itemEntry["description"],
             itemEntry["parent"], itemEntry["attributes"], itemEntry["url"],
-            itemEntry["task"], itemEntry["allowedTypes"], itemEntry["alternatives"], false)
+            itemEntry["task"], itemEntry["allowedTypes"], itemEntry["dimension"], itemEntry["alternatives"], false)
         } else {
             items[item] = new Item(item, itemEntry["description"],
             itemEntry["parent"], itemEntry["attributes"], itemEntry["url"],
-            itemEntry["task"], itemEntry["allowedTypes"], [], false)
+            itemEntry["task"], itemEntry["allowedTypes"], itemEntry["dimension"], [], false)
         }
     }
     toolbarLookup = {...tools, ...items}
@@ -436,7 +439,7 @@ function addCustomItem(name, parent, color=randomColors[Math.floor(Math.random()
         "defaultVal": "",
         "inputType": "text"
         }],
-        getSVGImageURL(name, color), 0, Object.keys(types), [], true, color
+        getSVGImageURL(name, color), 0, Object.keys(types),"1x1", [], true, color
     )
     item.custom = true
     toolbarLookup[name] = item

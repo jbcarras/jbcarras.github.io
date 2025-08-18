@@ -115,6 +115,8 @@ select {
     min-height: 6vh;
     flex: 1;
     background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     cursor: pointer;
     font-size: 0;
 }

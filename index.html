@@ -77,6 +77,13 @@
                 <label for="dark-mode">Dark Mode</label>
                 <input id="dark-mode" name="dark-mode" type="checkbox"
                     onclick="setDarkMode(this.checked); document.styleSheets[0].insertRule('* {transition: background-color 0.25s linear, border 0.25s linear, box-shadow 0.25s linear}')">
+                <br/>
+                <label for="hints">Tile Location Hints</label>
+                <select id="hints" onchange="redrawCanvas()">
+                    <option value="always">Always</option>
+                    <option value="ambiguous" selected>When Ambiguous</option>
+                    <option value="never">Never</option>
+                </select>
             </div>
             <hr/>
         </div>

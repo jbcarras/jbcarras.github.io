@@ -137,6 +137,16 @@ function getTile(event) {
     return [x, y]
 }
 
+function getRelativeLocation(event) {
+    let scaleFactor = getScaleFactor()
+    const rect = document.getElementById("level-visual").getBoundingClientRect()
+    const relX = event.clientX - rect.left
+    const relY = event.clientY - rect.top
+    const x = relX / 128 / scaleFactor
+    const y = relY / 128 / scaleFactor
+    return [x, y]
+}
+
 function drawTile(x, y, tile) {
     if ([x,y] in levelMap && levelMap[[x, y]].split(',')[1] === tile) {
         return
@@ -207,8 +217,6 @@ function redrawCanvas() {
             imgVOffset += activeBackground.image.height
             imgHOffset = 0
         }
-
-
     }
 
 
@@ -229,41 +237,62 @@ function redrawCanvas() {
                 savedAlternatives[itemName] = {}
             }
             if (alt in savedAlternatives[itemName]) {
-                context.drawImage(savedAlternatives[itemName][alt], x * 128, y * 128, 128, 128)
+                context.drawImage(savedAlternatives[itemName][alt], x * 128, y * 128, toolbarLookup[itemName].width * 128, toolbarLookup[itemName].height * 128)
             } else {
                 let alternativeUrl = toolbarLookup[itemName].alternatives.find((v) => v.value === csv.split(',')[csv.split(',').length - 1].split('\n')[0]).url
                 const img = new Image()
                 img.src = alternativeUrl
                 img.onload = () => {
-                    context.drawImage(img, x * 128, y * 128, 128, 128)
+                    redrawCanvas()
                 }
                 savedAlternatives[itemName][alt] = img
             }
         } else {
-            context.drawImage(toolbarLookup[itemName].image, x * 128, y * 128)
+            context.drawImage(toolbarLookup[itemName].image, x * 128, y * 128, toolbarLookup[itemName].width * 128, toolbarLookup[itemName].height * 128)
         }
     }
 
     drawGridOverlay()
 
+    let hintMode = document.getElementById("hints").value
+
+    if (hintMode !== "never") {
+        for (let [loc, csv] of Object.entries(levelMap)) {
+            let [x,y] = loc.split(',')
+            let itemName = csv.split(',')[1]
+
+            if ((Number(x) % (1 / gridScale) !== 0 || Number(y) % (1 / gridScale) !== 0)) {
+                realCanvas.getContext("2d").fillStyle = "rgba(252, 42, 35, 0.4)"
+                realCanvas.getContext("2d").fillRect(x * 128, y * 128, 128/gridScale, 128/gridScale)
+                drawGrid(realCanvas.getContext("2d"), x, y, "rgba(252, 42, 35, 1.0)", Math.min(gridScale / getScaleFactor() * 3, 16))
+            } else if (hintMode === "always" || toolbarLookup[itemName].width > 1/gridScale || toolbarLookup[itemName].height > 1/gridScale) {
+                realCanvas.getContext("2d").fillStyle = "rgba(252, 195, 35, 0.4)"
+                realCanvas.getContext("2d").fillRect(x * 128, y * 128, 128/gridScale, 128/gridScale)
+                drawGrid(realCanvas.getContext("2d"), x, y, "rgba(252, 195, 35, 1.0)", Math.min(gridScale / getScaleFactor() * 3, 16))
+            }
+        }
+    }
+
+
+
     document.getElementById("level-container").append(realCanvas)
 }
 
 
-function drawGrid(context, x, y) {
-    let thickness = 2 / (document.getElementById("zoom").value / 25)
-    context.fillStyle = "rgba(128, 128, 128, 0.4)"
-    context.fillRect(x * 128 / gridScale, y * 128 / gridScale, 128 / gridScale, thickness)
-    context.fillRect(x * 128 / gridScale, y * 128 / gridScale, thickness, 128)
-    context.fillRect((x * 128 + 127) / gridScale, y * 128 / gridScale, thickness, 128)
-    context.fillRect(x * 128 / gridScale, (y * 128 + 127) / gridScale, 128, thickness)
+function drawGrid(context, x, y, color="rgba(128, 128, 128, 0.4)", thickness=2) {
+    thickness = thickness / (document.getElementById("zoom").value / 25)
+    context.fillStyle = color
+    context.fillRect(x * 128, y * 128, 128 / gridScale, thickness)
+    context.fillRect(x * 128, y * 128, thickness, 128 / gridScale)
+    context.fillRect((x * 128 + 127 / gridScale), y * 128, thickness, 128 / gridScale)
+    context.fillRect(x * 128, (y * 128 + 127 / gridScale), 128 / gridScale + 1, thickness)
 }
 
 function drawGridOverlay() {
     let context = realCanvas.getContext("2d")
 
-    for (let y = 0; y < lvlHeight * gridScale; y++) {
-        for (let x = 0; x < lvlWidth * gridScale; x++) {
+    for (let y = 0; y < lvlHeight; y += 1/gridScale) {
+        for (let x = 0; x < lvlWidth; x += 1/gridScale) {
             drawGrid(context, x, y)
          }
     }
