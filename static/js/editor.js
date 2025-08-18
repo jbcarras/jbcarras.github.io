@@ -90,16 +90,13 @@ if (localStorage.getItem("theme") === "dark") {
 }
 
 function initEditor() {
-    document.getElementById("name").value = ""
-    document.getElementById("width").value = 12
-    document.getElementById("height").value = 8
-    document.getElementById("zoom").value = 31
-    document.getElementById("csv-entry").value = ""
-    document.getElementById("eraser-button").addEventListener("click", (event) => {setActiveItem(event)})
-    document.getElementById("player-button").addEventListener("click", (event) => setActiveItem(event))
-    document.getElementById("custom-button").addEventListener("click", (event) => setActiveItem(event))
-    document.getElementById("csv-button").addEventListener("click", (event) => setActiveItem(event))
-    document.getElementById("hints").value = "ambiguous"
+    setEditorDefaults()
+
+    document.getElementById("player-button").textContent = "Player"
+    document.getElementById("eraser-button").textContent = "Eraser"
+    document.getElementById("custom-button").textContent = "Customizer"
+    document.getElementById("csv-button").textContent = "CSV Editor"
+
     const reset = document.getElementById("reset")
     reset.addEventListener("click", resetLevel)
 
@@ -145,6 +142,19 @@ function initEditor() {
         renderToolbar()
         }).then(() => {initCanvas(); resetCanvas()
         }).then(() => resetLevel())
+}
+
+function setEditorDefaults() {
+    document.getElementById("name").value = ""
+    document.getElementById("width").value = 12
+    document.getElementById("height").value = 8
+    document.getElementById("zoom").value = 31
+    document.getElementById("csv-entry").value = ""
+    document.getElementById("eraser-button").addEventListener("click", (event) => {setActiveItem(event)})
+    document.getElementById("player-button").addEventListener("click", (event) => setActiveItem(event))
+    document.getElementById("custom-button").addEventListener("click", (event) => setActiveItem(event))
+    document.getElementById("csv-button").addEventListener("click", (event) => setActiveItem(event))
+    document.getElementById("hints").value = "ambiguous"
 }
 
 function initBackgrounds(backgrounds) {
@@ -495,6 +505,7 @@ function exportCustom() {
     link.download = filename
     link.click()
     URL.revokeObjectURL(link.href)
+
 }
 
 function importCustom(file) {
@@ -516,17 +527,19 @@ function toggleCSVEditor(to) {
     if (to) {
         document.getElementById("csv-editor").style.display = "block"
         document.getElementById("level-visual").style.display = "none"
-        document.getElementById("zoom-box").style.display = "none"
+        document.getElementById("top-bar").style.display = "none"
         document.getElementById("visual-mode-controls").style.display = "none"
         document.getElementById("toolbar-settings").style.display = "none"
         document.getElementById("csv-entry").value = levelToCSV()
+        document.removeEventListener("keydown", undoEvent)
     } else {
         document.getElementById("csv-editor").style.display = "none"
         document.getElementById("level-visual").style.display = "block"
-        document.getElementById("zoom-box").style.display = "flex"
+        document.getElementById("top-bar").style.display = "flex"
         document.getElementById("visual-mode-controls").style.display = "block"
         document.getElementById("toolbar-settings").style.display = "block"
         csvToLevel(document.getElementById("csv-entry").value)
+        document.addEventListener("keydown", undoEvent)
     }
 }
 
@@ -534,6 +547,9 @@ function resetLevel() {
     failed = []
     resetCanvas()
     setPlayerLocation("", "")
+    lastStroke = []
+    undoActions = []
+    redoActions = []
     if (activeItem === "CSV Editor") {
         document.getElementById("level-visual").style.display = "none"
         document.getElementById("zoom-box").style.display = "none"
@@ -614,6 +630,7 @@ function csvToLevel(csv) {
                 }
             }
         }
+        undoActions = []
         let contentStart = 3
         if (lvl[2].split(',')[0] !== "BackgroundTile" && lvl[2].split(',')[0] !== "BackgroundImage") {
             document.getElementById("background-select").value = "Default"
@@ -678,7 +695,7 @@ function csvToLevel(csv) {
         }
     } catch (e) {
         sendAlert(`Level import failed: ${e}`)
-        initEditor()
+        fetch("static/fallback.csv").then((response) => { response.text().then((text) => {csvToLevel(text)})})
     }
 
 }

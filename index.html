@@ -11,16 +11,27 @@
 </head>
 <body>
 <div id="alert-container"></div>
-<div id="zoom-box">
-            <label for="zoom">Zoom</label>
-            <input type="range" id="zoom" value="31" min="10" max="100" onchange="redrawCanvas(); manipulateCanvasMargin()">
-            <label for="grid-scale">Grid Scale</label>
-                <select id="grid-scale" onchange="gridScale = this.value; redrawCanvas()">
-                    <option value="1">1 Tile</option>
-                    <option value="2">1/2 Tile</option>
-                    <option value="4">1/4 Tile</option>
-                </select>
+<div id="top-bar">
+    <div>
+        <label for="zoom">Zoom</label>
+        <input type="range" id="zoom" value="31" min="10" max="100" onchange="redrawCanvas(); manipulateCanvasMargin()">
+    </div>
+    <div class="sep">|</div>
+    <div>
+        <label for="grid-scale">Grid Scale</label>
+        <select id="grid-scale" onchange="gridScale = this.value; redrawCanvas()">
+        <option value="1">1 Tile</option>
+        <option value="2">1/2 Tile</option>
+        <option value="4">1/4 Tile</option>
+    </select>
+    </div>
+    <div class="sep">|</div>
+    <div id="ur-container">
+        <button id="undo" onclick="undoAction()">↺</button>
+        <button id="redo" onclick="redoAction()">↻</button>
+    </div>
 </div>
+
 <div id="editor">
     <div id="level-container">
         <div id="csv-editor" style="display: none">
@@ -52,17 +63,21 @@
                 <br>
                 <div id="background-options" style="display: none">
                     <label for="bg-filename">Background Filename</label>
-                    <input id="bg-filename" name="bg-filename" type="text" value="Grass.png" onload="backgroundFname = this.value" onchange="backgroundFname = this.value">
+                    <input id="bg-filename" name="bg-filename" type="text" value="Grass.png"
+                           onload="backgroundFname = this.value" onchange="backgroundFname = this.value">
                     <br/>
                     <label for="bg-tiled">Tiled Background</label>
-                    <input id="bg-tiled" name="bg-tiled" type="checkbox" checked onload="bgTiled = this.checked" onclick="bgTiled = this.checked; document.getElementById('tile-controls').style.display = this.checked ? 'block' : 'none'">
+                    <input id="bg-tiled" name="bg-tiled" type="checkbox" checked onload="bgTiled = this.checked"
+                           onclick="bgTiled = this.checked; document.getElementById('tile-controls').style.display = this.checked ? 'block' : 'none'">
                     <span id="tile-controls" style="display: none">
                         <br/>
                         <label for="bg-col">Tile Column</label>
-                        <input id="bg-col" name="bg-col" type="number" value="0" min="0" size="3" oninput="this.value = Math.max(this.value, 0)">
+                        <input id="bg-col" name="bg-col" type="number" value="0" min="0" size="3"
+                               oninput="this.value = Math.max(this.value, 0)">
                         <br/>
                         <label for="bg-row">Tile Row</label>
-                        <input id="bg-row" name="bg-row" type="number" value="0" min="0" size="3" oninput="this.value = Math.max(this.value, 0)">
+                        <input id="bg-row" name="bg-row" type="number" value="0" min="0" size="3"
+                               oninput="this.value = Math.max(this.value, 0)">
                     </span>
                 </div>
             </div>
@@ -70,13 +85,13 @@
                 <button id="export">Export Level</button>
                 <label for="level-import" style="display: none">Import from CSV</label>
                 <input id="level-import" name="level-import" type="file" accept="text/csv" style="display: none"
-                    onchange="importLevel(this.files[this.files.length - 1])">
+                       onchange="importLevel(this.files[this.files.length - 1])">
                 <button onclick="document.getElementById('level-import').click()">Import Level</button>
                 <button id="reset">Reset</button>
                 <br/>
                 <label for="dark-mode">Dark Mode</label>
                 <input id="dark-mode" name="dark-mode" type="checkbox"
-                    onclick="setDarkMode(this.checked); document.styleSheets[0].insertRule('* {transition: background-color 0.25s linear, border 0.25s linear, box-shadow 0.25s linear}')">
+                       onclick="setDarkMode(this.checked); document.styleSheets[0].insertRule('* {transition: background-color 0.25s linear, border 0.25s linear, box-shadow 0.25s linear}')">
                 <br/>
                 <label for="hints">Tile Location Hints</label>
                 <select id="hints" onchange="redrawCanvas()">
@@ -89,11 +104,12 @@
         </div>
         <div id="item-info-container">
             <div id="attributes-section">
-            <h2>Level Editor</h2>
-            <p class="center">Click on a tile to start drawing it.</p>
-            <p class="center">Left Click - Draw</p>
-            <p class="center">Right Click - Erase</p>
-        </div>
+                <h2>Level Editor</h2>
+                <p class="center">Click on a tile to start drawing it.</p>
+                <p class="center">Left Click - Draw</p>
+                <p class="center">Right Click - Erase</p>
+                <p class="center">Ctrl-Z/Y - Undo/Redo</p>
+            </div>
             <div id="customizer" style="display: none">
                 <label for="custom-parent">Parent</label>
                 <br>
@@ -110,10 +126,13 @@
                 <br>
                 <button id="export-custom" name="export-custom" onclick="exportCustom()">Export Custom Items</button>
                 <br>
-                <button id="import-custom" name="import-custom" onclick="document.getElementById('import-custom-file').click()" >Import Custom Items</button>
+                <button id="import-custom" name="import-custom"
+                        onclick="document.getElementById('import-custom-file').click()">Import Custom Items
+                </button>
                 <label for="import-custom-file" style="display: none">Import Custom Items</label>
-                <input id="import-custom-file" name="import-custom-file" type="file" accept="application/json" style="display: none"
-                   onchange="importCustom(this.files[this.files.length - 1])">
+                <input id="import-custom-file" name="import-custom-file" type="file" accept="application/json"
+                       style="display: none"
+                       onchange="importCustom(this.files[this.files.length - 1])">
                 <br>
             </div>
         </div>

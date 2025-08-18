@@ -18,10 +18,10 @@ body {
 #level-container {
     box-shadow: 1px 1px 3px black
 }
-#secondary-container, #zoom-box {
+#secondary-container, #zoom-box, #top-bar {
     background-color: #1a1a1a
 }
-input, button, select {
+input, button, select, #settings > div > input, #attributes > input {
     background-color: #4b4d4d;
     border: 1px solid #4b4d4d
 }

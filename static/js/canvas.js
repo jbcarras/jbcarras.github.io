@@ -9,6 +9,10 @@ let playerLocation = ["", ""]
 
 let savedAlternatives = {}
 
+let lastStroke = []
+let undoActions = []
+let redoActions = []
+
 let hoverEvent = () => {}
 let upEvent = () => {}
 
@@ -24,6 +28,7 @@ function initCanvas() {
     }
     resetCanvas()
     document.getElementById("grid-scale").value = 1
+    document.addEventListener("keydown", undoEvent)
 }
 
 function manipulateCanvasMargin() {
@@ -50,7 +55,7 @@ function enableDrawing() {
 
     nvisual.addEventListener("mousedown", (event) => {event.preventDefault(); mouseDownEvent(event)})
     nvisual.addEventListener("contextmenu", (event) => {event.preventDefault();})
-    nvisual.addEventListener("mouseleave", () => { redrawCanvas(); setHoverEvent(() => {}) })
+    nvisual.addEventListener("mouseleave", () => { redrawCanvas(); setHoverEvent(() => {}); if (lastStroke.length > 0) rememberUndo(lastStroke) })
     nvisual.addEventListener("mousemove", hoverEvent)
     nvisual.addEventListener("mouseup", upEvent)
 }
@@ -64,6 +69,10 @@ function drawEvent(event) {
 function toolHandler(event) {
     if (activeItem === "Player" ) {
 
+        function rememberPlayer() {
+            rememberUndo([{"action":"draw","x":playerLocation[0],"y":playerLocation[1],"tile":"Player"}]);
+        }
+
         if (event.button === 0 && !(getTile(event)[0] === playerLocation[0] && getTile(event)[1] === playerLocation[1])) {
             let [x, y] = getTile(event)
             if (playerLocation in levelMap) {
@@ -71,8 +80,9 @@ function toolHandler(event) {
             }
             drawTile(x, y, activeItem)
             playerLocation = [x, y]
-            setHoverEvent(toolHandler)
-            setMouseUpEvent(() => setHoverEvent(() => {}))
+            setHoverEvent((event) => { lastStroke = []; toolHandler(event); })
+            setMouseUpEvent(() => { setHoverEvent(() => {}); rememberPlayer(); document.getElementById("level-visual").removeEventListener("mouseleave", rememberPlayer) } )
+            document.getElementById("level-visual").addEventListener("mouseleave", rememberPlayer)
             redrawCanvas()
         } else if (event.button !== 0) {
             let [x, y] = getTile(event)
@@ -101,6 +111,7 @@ function eraseEvent(event) {
 }
 
 function mouseDownEvent(event) {
+    lastStroke = []
     if (!(activeItem in toolbarLookup)) {
         return
     }
@@ -111,15 +122,23 @@ function mouseDownEvent(event) {
     if (event.button === 0) {
         let [x, y] = getTile(event)
         drawTile(x, y, activeItem)
-        setHoverEvent(drawEvent)
-        setMouseUpEvent(() => setHoverEvent(() => {}))
+        setHoverEvent((event) => { drawEvent(event); })
+        setMouseUpEvent(() => { setHoverEvent(() => {}); rememberUndo(lastStroke); lastStroke = [] } )
 
     } else {
         let [x, y] = getTile(event)
         removeTile(x, y)
         document.getElementById("level-visual").addEventListener("mousemove", eraseEvent)
+        setHoverEvent((event) => {
+            let [x, y] = getTile(event)
+            if ([x, y] in levelMap) {
+                lastStroke.push({"action":"erase","x":x,"y":y,"tile":levelMap[[x, y]]})
+            }
+
+            eraseEvent(event);
+        })
         hoverEvent = eraseEvent
-        setMouseUpEvent(() => setHoverEvent(() => {}))
+        setMouseUpEvent(() => { setHoverEvent(() => {}); rememberUndo(lastStroke); lastStroke = [] })
     }
 }
 
@@ -134,6 +153,88 @@ function setMouseUpEvent(event) {
     upEvent = event
     document.getElementById("level-visual").addEventListener("mouseup", event)
 
+}
+
+function rememberUndo(action) {
+    undoActions.push(invertAction(action))
+    if (undoActions.length > 128) {
+        undoActions.shift()
+    }
+}
+
+function rememberRedo(action) {
+    redoActions.push(action)
+    if (redoActions.length > 128) {
+        redoActions.shift()
+    }
+}
+
+function invertAction(action) {
+    let invAction = structuredClone(action)
+
+    for (let stroke of invAction) {
+        switch (stroke["action"]) {
+            case "draw":
+                if ("replace" in stroke) {
+                    let tile = stroke["tile"]
+                    stroke["tile"] = stroke["replace"]
+                    stroke["replace"] = tile
+                } else {
+                    stroke["action"] = "erase"
+                }
+                break
+            case "erase":
+                stroke["action"] = "draw"
+                break
+        }
+    }
+    return invAction
+}
+
+function execAction(action) {
+    for (let stroke of action) {
+        let x = Number(stroke["x"])
+        let y = Number(stroke["y"])
+        switch (stroke["action"]) {
+            case "draw":
+                drawTile(x, y, stroke["tile"])
+                break
+            case "erase":
+                removeTile(x, y)
+                break
+        }
+    }
+}
+
+function undoAction() {
+    if (undoActions.length > 0) {
+        let action = undoActions.pop()
+        execAction(action)
+        rememberRedo(invertAction(action))
+    } else {
+        sendAlert("Nothing to undo.")
+    }
+}
+
+function redoAction() {
+    if (redoActions.length > 0) {
+        let action = redoActions.pop()
+        execAction(action)
+        rememberUndo(action)
+    } else {
+        sendAlert("Nothing to redo.")
+    }
+}
+
+function undoEvent(event) {
+    event.preventDefault()
+    if (event.ctrlKey && event.key === "z") {
+        undoAction()
+        redrawCanvas()
+    } else if (event.ctrlKey && event.key === "y") {
+        redoAction()
+        redrawCanvas()
+    }
 }
 
 function getTile(event) {
@@ -165,9 +266,19 @@ function drawTile(x, y, tile) {
         playerLocation = ["", ""]
     }
 
+    if (tile === "Player") {
+        playerLocation = [x, y]
+    }
+
     if (!(tile in toolbarLookup)) {
         sendAlert(`Attempted to draw an invalid tile \"${tile}\". If this wasn't your fault, please report it.`)
         return
+    }
+
+    if ([x, y] in levelMap) {
+        lastStroke.push({"action":"draw","x":x,"y":y,"tile":tile, "replace":levelMap[[x,y]].split(',')[1]})
+    } else {
+        lastStroke.push({"action":"draw","x":x,"y":y,"tile":tile})
     }
 
     if (toolbarLookup[tile].image.complete) {
@@ -189,8 +300,10 @@ function removeTile(x, y) {
         playerLocation = ["", ""]
     }
 
-    delete levelMap[[x, y]]
-    redrawCanvas()
+    if ([x, y] in levelMap) {
+        delete levelMap[[x, y]]
+        redrawCanvas()
+    }
 }
 
 function getScaleFactor() {

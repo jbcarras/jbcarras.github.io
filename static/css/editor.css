@@ -33,7 +33,7 @@ button {
     font-weight: bold;
     border: 1px solid red;
 }
-input {
+#settings > div > input, #attributes > input {
     margin-bottom: 2%;
     border-radius: 5px;
     border: 1px solid darkgray;
@@ -198,4 +198,39 @@ select {
 .alert > button:hover {
     background-color: whitesmoke;
     color: #cf2929;
+}
+#ur-container > button {
+    margin: 3px;
+    font-size: 24px;
+    background-color: transparent;
+    border: none;
+}
+#top-bar {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    background-color: whitesmoke;
+    z-index: 1;
+    align-items: center;
+    border-radius: 10px;
+    margin: 3px;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+#top-bar > div > * {
+    margin-left: 3px;
+    margin-right: 3px;
+}
+#top-bar > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+.sep {
+    width: 1px;
+    background-color: darkgray;
+    color: transparent;
+    height: 95%;
 }
