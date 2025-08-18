@@ -259,7 +259,6 @@ function initItems(loadedItems) {
     }
     toolbarLookup = {...tools, ...items}
 }
-// ?
 
 function setDarkMode(to) {
     document.getElementById("dark-mode-style").disabled = !to
