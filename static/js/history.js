@@ -22,13 +22,34 @@ function endRecording() {
         return
     }
 
-    undoStack.push(invertAction(currentAction))
+    pushUndo(invertAction(currentAction))
     currentAction = []
+}
+
+function pushUndo(action) {
+    if (action.length === 0) {
+        return
+    }
+
+    undoStack.push(action)
     if (undoStack.length > 128) {
         undoStack.shift()
     }
     document.getElementById("undo").classList.remove("disabled")
     document.getElementById("undo").onclick = () => { undoAction() }
+}
+
+function pushRedo(action) {
+    if (action.length === 0) {
+        return
+    }
+
+    redoStack.push(action)
+    if (redoStack.length > 128) {
+        redoStack.shift()
+    }
+    document.getElementById("redo").classList.remove("disabled")
+    document.getElementById("redo").onclick = () => { redoAction() }
 }
 
 
@@ -42,19 +63,6 @@ function clearUndo() {
     undoStack = []
     document.getElementById("undo").classList.add("disabled")
     document.getElementById("undo").onclick = () => {}
-}
-
-function rememberRedo(action) {
-    if (action.length === 0) {
-        return
-    }
-
-    redoStack.push(action)
-    document.getElementById("redo").classList.remove("disabled")
-    document.getElementById("redo").onclick = () => { redoAction() }
-    if (redoStack.length > 128) {
-        redoStack.shift()
-    }
 }
 
 function invertAction(action) {
@@ -117,7 +125,7 @@ function undoAction() {
     if (undoStack.length > 0) {
         let action = undoStack.pop()
         execAction(action)
-        rememberRedo(invertAction(action))
+        pushRedo(invertAction(action))
         if (undoStack.length === 0) {
             document.getElementById("undo").classList.add("disabled")
             document.getElementById("undo").onclick = () => {}
@@ -131,7 +139,7 @@ function redoAction() {
     if (redoStack.length > 0) {
         let action = redoStack.pop()
         execAction(action)
-        undoStack.push(invertAction(action))
+        pushUndo(invertAction(action))
         if (redoStack.length === 0) {
             document.getElementById("redo").classList.add("disabled")
             document.getElementById("redo").onclick = () => {}
