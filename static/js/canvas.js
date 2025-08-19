@@ -68,9 +68,8 @@ function drawEvent(event) {
 
 function toolHandler(event) {
     if (activeItem === "Player" ) {
-
         function rememberPlayer() {
-            rememberUndo([{"action":"draw","x":playerLocation[0],"y":playerLocation[1],"tile":"Player"}]);
+            rememberUndo([{"action":"draw","x":playerLocation[0],"y":playerLocation[1],"tile":levelMap[[playerLocation[0], playerLocation[1]]]}]);
         }
 
         if (event.button === 0 && !(getTile(event)[0] === playerLocation[0] && getTile(event)[1] === playerLocation[1])) {
@@ -98,8 +97,9 @@ function toolHandler(event) {
     if (activeItem === "Eraser") {
         let [x, y] = getTile(event)
         removeTile(x, y)
-        setHoverEvent(eraseEvent)
-        setMouseUpEvent(() => setHoverEvent(() => {}))
+        setHoverEvent((event) => {lastStroke = []; eraseEvent(event)})
+        setMouseUpEvent(() => { setHoverEvent(() => { }); rememberUndo(lastStroke); document.getElementById("level-visual").removeEventListener("mouseleave", (event) => { rememberUndo(lastStroke); } ) })
+        document.getElementById("level-visual").addEventListener("mouseleave", (event) => { rememberUndo(lastStroke); })
     }
 
 }
@@ -197,13 +197,21 @@ function execAction(action) {
         let y = Number(stroke["y"])
         switch (stroke["action"]) {
             case "draw":
-                drawTile(x, y, stroke["tile"])
+                if (stroke["tile"].split(',')[1] === "Player") {
+                    playerLocation = [x, y]
+                }
+                levelMap[[x, y]] = stroke["tile"]
                 break
             case "erase":
+                if (playerLocation[0] === x && playerLocation[1] === y) {
+                    playerLocation = ["", ""]
+                }
+                delete levelMap[[x, y]]
                 removeTile(x, y)
                 break
         }
     }
+    redrawCanvas()
 }
 
 function undoAction() {
@@ -260,6 +268,7 @@ function getRelativeLocation(event) {
 
 function drawTile(x, y, tile) {
     if ([x,y] in levelMap && levelMap[[x, y]].split(',')[1] === tile) {
+        writeTile(x, y, tile)
         return
     }
 
@@ -271,22 +280,15 @@ function drawTile(x, y, tile) {
         playerLocation = [x, y]
     }
 
+    let lastTile = [x, y] in levelMap ? levelMap[[x, y]] : ""
+
     if (!(tile in toolbarLookup)) {
         sendAlert(`Attempted to draw an invalid tile \"${tile}\". If this wasn't your fault, please report it.`)
         return
     }
 
-    if ([x, y] in levelMap) {
-        lastStroke.push({"action":"draw","x":x,"y":y,"tile":tile, "replace":levelMap[[x,y]].split(',')[1]})
-    } else {
-        lastStroke.push({"action":"draw","x":x,"y":y,"tile":tile})
-    }
-
     if (toolbarLookup[tile].image.complete) {
-        let parent = toolbarLookup[tile].parent
-        let name = toolbarLookup[tile].name
-        const attributes = document.getElementsByClassName("attribute").length !== 0 && !(toolbarLookup[activeItem].custom && document.getElementById("Attributes").value.length === 0) ? "," + Array.from(document.getElementsByClassName("attribute")).map((element) => element.value).reduce((a, b) => a + "," + b) : ""
-        levelMap[[x, y]] = `${parent},${name},${x},${y}${attributes}\n`
+        writeTile(x, y, tile)
         redrawCanvas()
     } else {
         toolbarLookup[tile].image.onload = () => {
@@ -294,6 +296,18 @@ function drawTile(x, y, tile) {
         }
     }
 
+    if (lastTile !== "") {
+        lastStroke.push({"action":"draw","x":x,"y":y,"tile":levelMap[[x,y]], "replace":lastTile})
+    } else {
+        lastStroke.push({"action":"draw","x":x,"y":y,"tile":levelMap[[x,y]]})
+    }
+}
+
+function writeTile(x, y, tile) {
+    let parent = toolbarLookup[tile].parent
+    let name = toolbarLookup[tile].name
+    const attributes = document.getElementsByClassName("attribute").length !== 0 && !(toolbarLookup[activeItem].custom && document.getElementById("Attributes").value.length === 0) ? "," + Array.from(document.getElementsByClassName("attribute")).map((element) => element.value).reduce((a, b) => a + "," + b) : ""
+    levelMap[[x, y]] = `${parent},${name},${x},${y}${attributes}\n`
 }
 
 function removeTile(x, y) {
@@ -302,6 +316,7 @@ function removeTile(x, y) {
     }
 
     if ([x, y] in levelMap) {
+        lastStroke.push({"action":"erase","x":x,"y":y,"tile":levelMap[[x,y]]})
         delete levelMap[[x, y]]
         redrawCanvas()
     }

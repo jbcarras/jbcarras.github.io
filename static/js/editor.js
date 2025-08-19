@@ -97,6 +97,14 @@ function initEditor() {
     document.getElementById("custom-button").textContent = "Customizer"
     document.getElementById("csv-button").textContent = "CSV Editor"
 
+    if (localStorage.getItem("tb") !== null) {
+        const topBar = document.getElementById("top-bar")
+        topBar.style.top = localStorage.getItem("tb").split(',')[1] + "px"
+        topBar.style.left = localStorage.getItem("tb").split(',')[0] + "px"
+    }
+
+    document.getElementById("tb-drag").addEventListener("mousedown", moveTopBar)
+
     const reset = document.getElementById("reset")
     reset.addEventListener("click", resetLevel)
 
@@ -142,6 +150,24 @@ function initEditor() {
         renderToolbar()
         }).then(() => {initCanvas(); resetCanvas()
         }).then(() => resetLevel())
+}
+
+function moveTopBar(event) {
+
+    let topBar = document.getElementById("top-bar")
+
+    let offX = event.clientX - topBar.getBoundingClientRect().left
+    let offY = event.clientY - topBar.getBoundingClientRect().top
+
+
+    function tbPos(event) {
+        topBar.style.top = event.clientY - offY + "px"
+        topBar.style.left = event.clientX - offX + "px"
+        localStorage.setItem("tb", `${event.clientX - offX},${event.clientY - offY}`)
+    }
+
+    document.addEventListener("mousemove", tbPos)
+    document.addEventListener("mouseup", () => {document.removeEventListener("mousemove", tbPos)})
 }
 
 function setEditorDefaults() {

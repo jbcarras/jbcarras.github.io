@@ -210,6 +210,7 @@ select {
 #top-bar > div > * {
     margin-left: 3px;
     margin-right: 3px;
+    user-select: none;
 }
 #top-bar > div {
     display: flex;
@@ -217,10 +218,17 @@ select {
     align-items: center;
     margin-left: 3px;
     margin-right: 3px;
+    user-select: none;
 }
 .sep {
     width: 1px;
     background-color: darkgray;
     color: transparent;
     height: 95%;
+}
+#tb-drag {
+    cursor: grab;
+}
+#tb-drag:active {
+    cursor: grabbing;
 }
