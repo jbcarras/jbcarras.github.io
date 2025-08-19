@@ -166,8 +166,9 @@ function moveTopBar(event) {
         localStorage.setItem("tb", `${event.clientX - offX},${event.clientY - offY}`)
     }
 
+    document.querySelector(":root").style.setProperty("--global-cursor", "grabbing")
     document.addEventListener("mousemove", tbPos)
-    document.addEventListener("mouseup", () => {document.removeEventListener("mousemove", tbPos)})
+    document.addEventListener("mouseup", () => {document.removeEventListener("mousemove", tbPos); document.querySelector(":root").style.setProperty("--global-cursor", "default")})
 }
 
 function setEditorDefaults() {
@@ -320,27 +321,59 @@ function renderToolbar() {
     }
 }
 
+function overrideLevelSize(width, height) {
+    document.getElementById("width").value = width
+    document.getElementById("height").value = height
+
+    lvlHeight = height
+    lvlWidth = width
+
+    redrawCanvas()
+    manipulateCanvasMargin()
+    handleOOB()
+}
+
 function resizeLevel() {
+    let nHeight = Number(document.getElementById("height").value)
+    let nWidth = Number(document.getElementById("width").value)
 
-    rememberUndo([{"action":"resize", "width": lvlWidth, "height": lvlHeight}])
 
-    lvlHeight = Number(document.getElementById("height").value)
-    lvlWidth = Number(document.getElementById("width").value)
+    if (nHeight * nWidth > 16384 && nHeight * nWidth > lvlHeight * lvlWidth) {
+        let button = document.createElement("button")
+        button.textContent = "Override"
+        button.addEventListener("click", () => {overrideLevelSize(nWidth, nHeight)})
 
-    let oob = Object.entries(levelMap).filter(([_, entry]) => { return entry.split(',')[2] >= lvlWidth || entry.split(',')[3] >= lvlHeight })
+        document.getElementById("height").value = lvlHeight
+        document.getElementById("width").value = lvlWidth
+
+        sendAlert("Large levels are currently not supported for performance reasons. Override at your own risk.", button)
+        return
+    } else {
+        lvlHeight = nHeight
+        lvlWidth = nWidth
+    }
+
+    startRecording()
+    rememberStroke({"action":"resize", "width": lvlWidth, "height": lvlHeight})
+    endRecording()
 
     redrawCanvas()
     manipulateCanvasMargin()
 
+    handleOOB()
+}
+
+function handleOOB() {
+    let oob = Object.entries(levelMap).filter(([_, entry]) => { return entry.split(',')[2] >= lvlWidth || entry.split(',')[3] >= lvlHeight })
     function clearOOB() {
-        let strokes = []
+        startRecording()
         for (const [item, csv] of oob) {
-            strokes.push({"action":"erase", "x":csv.split(',')[2], "y":csv.split(',')[3].replace("\n",""), "tile":csv})
+            rememberStroke({"action":"erase", "x":csv.split(',')[2], "y":csv.split(',')[3].replace("\n",""), "tile":csv})
             delete levelMap[item]
         }
-        rememberUndo(strokes)
         redrawCanvas()
         sendAlert("Cleared out of bounds tiles.")
+        endRecording()
     }
 
     if (Object.keys(oob).length !== 0) {
@@ -470,7 +503,6 @@ function changeBackground(to) {
         }
     }
 }
-
 
 function customizerAdd() {
     let name = document.getElementById("custom-name").value
@@ -666,7 +698,9 @@ function csvToLevel(csv) {
                 }
             }
         }
-        undoActions = []
+        clearUndo()
+        clearRedo()
+        lastStroke = []
         let contentStart = 3
         if (lvl[2].split(',')[0] !== "BackgroundTile" && lvl[2].split(',')[0] !== "BackgroundImage") {
             document.getElementById("background-select").value = "Default"

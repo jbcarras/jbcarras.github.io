@@ -9,10 +9,6 @@ let playerLocation = ["", ""]
 
 let savedAlternatives = {}
 
-let lastStroke = []
-let undoActions = []
-let redoActions = []
-
 let hoverEvent = () => {}
 let upEvent = () => {}
 
@@ -55,7 +51,7 @@ function enableDrawing() {
 
     nvisual.addEventListener("mousedown", (event) => {event.preventDefault(); mouseDownEvent(event)})
     nvisual.addEventListener("contextmenu", (event) => {event.preventDefault();})
-    nvisual.addEventListener("mouseleave", () => { redrawCanvas(); setHoverEvent(() => {}); if (lastStroke.length > 0) rememberUndo(lastStroke) })
+    nvisual.addEventListener("mouseleave", () => { redrawCanvas(); setHoverEvent(() => {}); endRecording() })
     nvisual.addEventListener("mousemove", hoverEvent)
     nvisual.addEventListener("mouseup", upEvent)
 }
@@ -68,20 +64,17 @@ function drawEvent(event) {
 
 function toolHandler(event) {
     if (activeItem === "Player" ) {
-        function rememberPlayer() {
-            rememberUndo([{"action":"draw","x":playerLocation[0],"y":playerLocation[1],"tile":levelMap[[playerLocation[0], playerLocation[1]]]}]);
-        }
-
         if (event.button === 0 && !(getTile(event)[0] === playerLocation[0] && getTile(event)[1] === playerLocation[1])) {
+            startRecording()
             let [x, y] = getTile(event)
             if (playerLocation in levelMap) {
+                rememberStroke({"action":"erase","x":playerLocation[0],"y":playerLocation[1],"tile":levelMap[playerLocation]})
                 delete levelMap[playerLocation]
             }
             drawTile(x, y, activeItem)
             playerLocation = [x, y]
-            setHoverEvent((event) => { lastStroke = []; toolHandler(event); })
-            setMouseUpEvent(() => { setHoverEvent(() => {}); rememberPlayer(); document.getElementById("level-visual").removeEventListener("mouseleave", rememberPlayer) } )
-            document.getElementById("level-visual").addEventListener("mouseleave", rememberPlayer)
+            setHoverEvent((event) => { toolHandler(event); })
+            setMouseUpEvent(() => { setHoverEvent(() => {}); endRecording() })
             redrawCanvas()
         } else if (event.button !== 0) {
             let [x, y] = getTile(event)
@@ -97,9 +90,9 @@ function toolHandler(event) {
     if (activeItem === "Eraser") {
         let [x, y] = getTile(event)
         removeTile(x, y)
-        setHoverEvent((event) => {lastStroke = []; eraseEvent(event)})
-        setMouseUpEvent(() => { setHoverEvent(() => { }); rememberUndo(lastStroke); document.getElementById("level-visual").removeEventListener("mouseleave", (event) => { rememberUndo(lastStroke); } ) })
-        document.getElementById("level-visual").addEventListener("mouseleave", (event) => { rememberUndo(lastStroke); })
+        startRecording()
+        setHoverEvent((event) => { eraseEvent(event)})
+        setMouseUpEvent(() => { setHoverEvent(() => {}); endRecording() })
     }
 
 }
@@ -110,8 +103,6 @@ function eraseEvent(event) {
 }
 
 function mouseDownEvent(event) {
-    lastStroke = []
-    clearRedo()
     if (!(activeItem in toolbarLookup)) {
         return
     }
@@ -121,24 +112,26 @@ function mouseDownEvent(event) {
     }
     if (event.button === 0) {
         let [x, y] = getTile(event)
+        startRecording()
         drawTile(x, y, activeItem)
         setHoverEvent((event) => { drawEvent(event); })
-        setMouseUpEvent(() => { setHoverEvent(() => {}); rememberUndo(lastStroke); lastStroke = [] } )
+        setMouseUpEvent(() => { setHoverEvent(() => {}); endRecording() } )
 
     } else {
         let [x, y] = getTile(event)
+        startRecording()
         removeTile(x, y)
         document.getElementById("level-visual").addEventListener("mousemove", eraseEvent)
         setHoverEvent((event) => {
             let [x, y] = getTile(event)
             if ([x, y] in levelMap) {
-                lastStroke.push({"action":"erase","x":x,"y":y,"tile":levelMap[[x, y]]})
+                rememberStroke({"action":"erase","x":x,"y":y,"tile":levelMap[[x, y]]})
             }
 
             eraseEvent(event);
         })
         setHoverEvent(eraseEvent)
-        setMouseUpEvent(() => { setHoverEvent(() => {}); rememberUndo(lastStroke); lastStroke = [] })
+        setMouseUpEvent(() => { setHoverEvent(() => {}); endRecording() })
     }
 }
 
@@ -153,131 +146,6 @@ function setMouseUpEvent(event) {
     upEvent = event
     document.getElementById("level-visual").addEventListener("mouseup", event)
 
-}
-
-function clearRedo() {
-    redoActions = []
-    document.getElementById("redo").classList.add("disabled")
-    document.getElementById("redo").onclick = () => {}
-}
-
-function clearUndo() {
-    undoActions = []
-    document.getElementById("undo").classList.add("disabled")
-    document.getElementById("undo").onclick = () => {}
-}
-
-function rememberUndo(action) {
-    undoActions.push(invertAction(action))
-    document.getElementById("undo").classList.remove("disabled")
-    document.getElementById("undo").onclick = () => { undoAction() }
-    if (undoActions.length > 128) {
-        undoActions.shift()
-    }
-}
-
-function rememberRedo(action) {
-    redoActions.push(action)
-    document.getElementById("redo").classList.remove("disabled")
-    document.getElementById("redo").onclick = () => { redoAction() }
-    if (redoActions.length > 128) {
-        redoActions.shift()
-    }
-}
-
-function invertAction(action) {
-    let invAction = structuredClone(action)
-
-    for (let stroke of invAction) {
-        switch (stroke["action"]) {
-            case "draw":
-                if ("replace" in stroke) {
-                    let tile = stroke["tile"]
-                    stroke["tile"] = stroke["replace"]
-                    stroke["replace"] = tile
-                } else {
-                    stroke["action"] = "erase"
-                }
-                break
-            case "erase":
-                stroke["action"] = "draw"
-                break
-            case "resize":
-                break
-        }
-    }
-    return invAction
-}
-
-function execAction(action) {
-    for (let stroke of action) {
-        let x = Number(stroke["x"])
-        let y = Number(stroke["y"])
-        switch (stroke["action"]) {
-            case "draw":
-                if (stroke["tile"].split(',')[1] === "Player") {
-                    playerLocation = [x, y]
-                }
-                levelMap[[x, y]] = stroke["tile"]
-                break
-            case "erase":
-                if (playerLocation[0] === x && playerLocation[1] === y) {
-                    playerLocation = ["", ""]
-                }
-                delete levelMap[[x, y]]
-                removeTile(x, y)
-                break
-            case "resize":
-                document.getElementById("height").value = stroke["height"]
-                document.getElementById("width").value = stroke["width"]
-                lvlHeight = stroke["height"]
-                lvlWidth = stroke["width"]
-                redrawCanvas()
-                manipulateCanvasMargin()
-                break
-        }
-    }
-    redrawCanvas()
-}
-
-function undoAction() {
-    if (undoActions.length > 0) {
-        let action = undoActions.pop()
-        execAction(action)
-        rememberRedo(invertAction(action))
-        if (undoActions.length === 0) {
-            document.getElementById("undo").classList.add("disabled")
-            document.getElementById("undo").onclick = () => {}
-        }
-    } else {
-        sendAlert("Nothing to undo.")
-    }
-}
-
-function redoAction() {
-    if (redoActions.length > 0) {
-        let action = redoActions.pop()
-        execAction(action)
-        rememberUndo(action)
-        if (redoActions.length === 0) {
-            document.getElementById("redo").classList.add("disabled")
-            document.getElementById("redo").onclick = () => {}
-        }
-    } else {
-        sendAlert("Nothing to redo.")
-    }
-}
-
-function undoEvent(event) {
-    if (event.ctrlKey && event.key === "z") {
-        event.preventDefault()
-        undoAction()
-        redrawCanvas()
-    } else if (event.ctrlKey && event.key === "y") {
-        event.preventDefault()
-        redoAction()
-        redrawCanvas()
-    }
 }
 
 function getTile(event) {
@@ -331,9 +199,9 @@ function drawTile(x, y, tile) {
     }
 
     if (lastTile !== "") {
-        lastStroke.push({"action":"draw","x":x,"y":y,"tile":levelMap[[x,y]], "replace":lastTile})
+        rememberStroke({"action":"draw","x":x,"y":y,"tile":levelMap[[x,y]], "replace":lastTile})
     } else {
-        lastStroke.push({"action":"draw","x":x,"y":y,"tile":levelMap[[x,y]]})
+        rememberStroke({"action":"draw","x":x,"y":y,"tile":levelMap[[x,y]]})
     }
 }
 
@@ -350,7 +218,7 @@ function removeTile(x, y) {
     }
 
     if ([x, y] in levelMap) {
-        lastStroke.push({"action":"erase","x":x,"y":y,"tile":levelMap[[x,y]]})
+        rememberStroke({"action":"erase","x":x,"y":y,"tile":levelMap[[x, y]]})
         delete levelMap[[x, y]]
         redrawCanvas()
     }

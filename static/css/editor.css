@@ -1,5 +1,7 @@
 :root {
-    --tile-size: 6.0vh
+    --tile-size: 6.0vh;
+    --global-cursor: default;
+    cursor: var(--global-cursor);
 }
 body {
     background-color: darkgray;
@@ -22,10 +24,13 @@ button {
     font-weight: bold;
     border: 1px solid red;
 }
-#settings > div > input, #attributes > input {
+input {
     margin-bottom: 2%;
     border-radius: 5px;
     border: 1px solid darkgray;
+}
+#zoom {
+    margin-bottom: 0;
 }
 hr {
     width: 100%
