@@ -41,9 +41,6 @@ hr {
 }
 #editor {
     display: flex;
-    padding: 2%;
-    min-height: 90vh;
-    max-height: 90vh;
     align-items: center;
 }
 select {
@@ -60,6 +57,7 @@ select {
     height: 90vh;
     overflow-y: scroll;
     overflow-x: hidden;
+    border-radius: 5px;
 }
 #item-info-container {
     min-height: 25%;
@@ -231,4 +229,8 @@ select {
 }
 #tb-drag:active {
     cursor: grabbing;
+}
+.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }

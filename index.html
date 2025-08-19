@@ -12,7 +12,7 @@
 <body>
 <div id="alert-container"></div>
 <div id="top-bar">
-    <div id="tb-drag" onmousedown="moveTopBar()">
+    <div id="tb-drag">
         ⋮⋮
     </div>
     <div>
@@ -39,8 +39,8 @@
     </div>
     <div class="sep">|</div>
     <div id="ur-container">
-        <button id="undo" onclick="undoAction()">↺</button>
-        <button id="redo" onclick="redoAction()">↻</button>
+        <button id="undo" class="disabled" onclick="undoAction()">↺</button>
+        <button id="redo" class="disabled" onclick="redoAction()">↻</button>
     </div>
 </div>
 
@@ -54,7 +54,7 @@
     </div>
     <div id="secondary-container">
         <div id="settings">
-            <h2>Settings</h2>
+            <h1>Level Editor</h1>
             <div id="visual-mode-controls">
                 <label for="name">Level Name</label>
                 <input id="name" name="name" type="text" oninput="{
@@ -70,8 +70,11 @@
                 <input id="height" name="height" type="number" value="8" min="1" size="3"
                        oninput="this.value = Math.max(this.value, 1); resizeLevel()">
                 <br/>
-                <label for="background-select">Background Select</label>
-                <select id="background-select" name="background-select"></select>
+                <label for="background-select">Background</label>
+                <select id="background-select" name="background-select">
+                    <optgroup label="Tiles" id="tile-group"></optgroup>
+                    <optgroup label="Backgrounds" id="bg-group"></optgroup>
+                </select>
                 <br>
                 <div id="background-options" style="display: none">
                     <label for="bg-filename">Background Filename</label>
@@ -110,7 +113,6 @@
         </div>
         <div id="item-info-container">
             <div id="attributes-section">
-                <h2>Level Editor</h2>
                 <p class="center">Click on a tile to start drawing it.</p>
                 <p class="center">Left Click - Draw</p>
                 <p class="center">Right Click - Erase</p>

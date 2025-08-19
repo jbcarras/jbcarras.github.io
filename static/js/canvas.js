@@ -111,7 +111,7 @@ function eraseEvent(event) {
 
 function mouseDownEvent(event) {
     lastStroke = []
-    redoActions = []
+    clearRedo()
     if (!(activeItem in toolbarLookup)) {
         return
     }
@@ -155,8 +155,22 @@ function setMouseUpEvent(event) {
 
 }
 
+function clearRedo() {
+    redoActions = []
+    document.getElementById("redo").classList.add("disabled")
+    document.getElementById("redo").onclick = () => {}
+}
+
+function clearUndo() {
+    undoActions = []
+    document.getElementById("undo").classList.add("disabled")
+    document.getElementById("undo").onclick = () => {}
+}
+
 function rememberUndo(action) {
     undoActions.push(invertAction(action))
+    document.getElementById("undo").classList.remove("disabled")
+    document.getElementById("undo").onclick = () => { undoAction() }
     if (undoActions.length > 128) {
         undoActions.shift()
     }
@@ -164,6 +178,8 @@ function rememberUndo(action) {
 
 function rememberRedo(action) {
     redoActions.push(action)
+    document.getElementById("redo").classList.remove("disabled")
+    document.getElementById("redo").onclick = () => { redoAction() }
     if (redoActions.length > 128) {
         redoActions.shift()
     }
@@ -185,6 +201,8 @@ function invertAction(action) {
                 break
             case "erase":
                 stroke["action"] = "draw"
+                break
+            case "resize":
                 break
         }
     }
@@ -209,6 +227,14 @@ function execAction(action) {
                 delete levelMap[[x, y]]
                 removeTile(x, y)
                 break
+            case "resize":
+                document.getElementById("height").value = stroke["height"]
+                document.getElementById("width").value = stroke["width"]
+                lvlHeight = stroke["height"]
+                lvlWidth = stroke["width"]
+                redrawCanvas()
+                manipulateCanvasMargin()
+                break
         }
     }
     redrawCanvas()
@@ -219,6 +245,10 @@ function undoAction() {
         let action = undoActions.pop()
         execAction(action)
         rememberRedo(invertAction(action))
+        if (undoActions.length === 0) {
+            document.getElementById("undo").classList.add("disabled")
+            document.getElementById("undo").onclick = () => {}
+        }
     } else {
         sendAlert("Nothing to undo.")
     }
@@ -229,6 +259,10 @@ function redoAction() {
         let action = redoActions.pop()
         execAction(action)
         rememberUndo(action)
+        if (redoActions.length === 0) {
+            document.getElementById("redo").classList.add("disabled")
+            document.getElementById("redo").onclick = () => {}
+        }
     } else {
         sendAlert("Nothing to redo.")
     }
@@ -410,11 +444,11 @@ function redrawCanvas() {
             if ((Number(x) % (1 / gridScale) !== 0 || Number(y) % (1 / gridScale) !== 0)) {
                 realCanvas.getContext("2d").fillStyle = "rgba(252, 42, 35, 0.4)"
                 realCanvas.getContext("2d").fillRect(x * 128, y * 128, 128/gridScale, 128/gridScale)
-                drawGrid(realCanvas.getContext("2d"), x, y, "rgba(252, 42, 35, 1.0)", Math.min(gridScale / getScaleFactor() * 3, 16))
+                drawGrid(realCanvas.getContext("2d"), x, y, "rgba(252, 42, 35, 1.0)", Math.min(gridScale / getScaleFactor() * 3/2, 8))
             } else if (hintMode === "always" || toolbarLookup[itemName].width > 1/gridScale || toolbarLookup[itemName].height > 1/gridScale) {
                 realCanvas.getContext("2d").fillStyle = "rgba(252, 195, 35, 0.4)"
                 realCanvas.getContext("2d").fillRect(x * 128, y * 128, 128/gridScale, 128/gridScale)
-                drawGrid(realCanvas.getContext("2d"), x, y, "rgba(252, 195, 35, 1.0)", Math.min(gridScale / getScaleFactor() * 3, 16))
+                drawGrid(realCanvas.getContext("2d"), x, y, "rgba(252, 195, 35, 1.0)", Math.min(gridScale / getScaleFactor() * 3/2, 8))
             }
         }
     }

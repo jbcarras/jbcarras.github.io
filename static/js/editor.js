@@ -199,12 +199,16 @@ function initBackgrounds(backgrounds) {
         let select = document.createElement("option")
         select.value = bg.displayName
         select.textContent = bg.displayName
-        selector.append(select)
+        if (bg.tiled) {
+            document.getElementById("tile-group").append(select)
+        } else {
+            document.getElementById("bg-group").append(select)
+        }
     }
     let custom = document.createElement("option")
     custom.value = "Custom"
     custom.textContent = "Custom"
-    selector.append(custom)
+    selector.prepend(custom)
     let lvlDefault = document.createElement("option")
     lvlDefault.value = "Default"
     lvlDefault.textContent = "Default"
@@ -317,6 +321,9 @@ function renderToolbar() {
 }
 
 function resizeLevel() {
+
+    rememberUndo([{"action":"resize", "width": lvlWidth, "height": lvlHeight}])
+
     lvlHeight = Number(document.getElementById("height").value)
     lvlWidth = Number(document.getElementById("width").value)
 
@@ -326,9 +333,12 @@ function resizeLevel() {
     manipulateCanvasMargin()
 
     function clearOOB() {
-        for (const [item, _] of oob) {
+        let strokes = []
+        for (const [item, csv] of oob) {
+            strokes.push({"action":"erase", "x":csv.split(',')[2], "y":csv.split(',')[3].replace("\n",""), "tile":csv})
             delete levelMap[item]
         }
+        rememberUndo(strokes)
         redrawCanvas()
         sendAlert("Cleared out of bounds tiles.")
     }
@@ -337,13 +347,13 @@ function resizeLevel() {
         const button = document.createElement("button")
         button.textContent = "Remove"
         button.addEventListener("click", clearOOB)
-        sendAlert(`${Object.keys(oob).length} tile${Object.keys(oob).length === 1 ? "" : "s"} are out of bounds. They can be removed by pressing this button.`, button)
+        sendAlert(`${Object.keys(oob).length} tile${Object.keys(oob).length === 1 ? " is" : "s are"} out of bounds. They can be removed by pressing this button.`, button)
     }
 }
 
 function renderAttributes() {
     if (!Object.keys(toolbarLookup).includes(activeItem)) {
-        document.getElementById("attributes-section").innerHTML = "<h2>Level Editor</h2><p class=\"center\">Click on a tile to start drawing it.</p><p class=\"center\">Left Click - Draw</p> <p class=\"center\">Right Click - Erase</p>"
+        document.getElementById("attributes-section").innerHTML = "<p class=\"center\">Click on a tile to start drawing it.</p><p class=\"center\">Left Click - Draw</p> <p class=\"center\">Right Click - Erase</p>"
         return
     }
     let attributesSec = document.getElementById("attributes-section")
@@ -574,8 +584,8 @@ function resetLevel() {
     resetCanvas()
     setPlayerLocation("", "")
     lastStroke = []
-    undoActions = []
-    redoActions = []
+    clearUndo()
+    clearRedo()
     if (activeItem === "CSV Editor") {
         document.getElementById("level-visual").style.display = "none"
         document.getElementById("zoom-box").style.display = "none"
@@ -600,7 +610,7 @@ function importLevel(file) {
             }
         }
     } catch (e) {
-        sendAlert(`Catastrophic failure to import level: ${e}.`)
+        sendAlert(`Catastrophic failure to import level: ${e}. Please report this.`)
     }
 }
 
@@ -720,7 +730,8 @@ function csvToLevel(csv) {
             sendAlert(`Tiles not located on a quarter tile increment cannot be modified in visual mode.`)
         }
     } catch (e) {
-        sendAlert(`Level import failed: ${e}`)
+        sendAlert(`Level import failed. Ensure your level is properly formatted and please report this otherwise.`)
+        sendAlert(`${e}`)
         fetch("static/fallback.csv").then((response) => { response.text().then((text) => {csvToLevel(text)})})
     }
 
