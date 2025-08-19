@@ -12,6 +12,9 @@
 <body>
 <div id="alert-container"></div>
 <div id="top-bar">
+    <div id="tb-drag" onmousedown="moveTopBar()">
+        ⋮⋮
+    </div>
     <div>
         <label for="zoom">Zoom</label>
         <input type="range" id="zoom" value="31" min="10" max="100" onchange="redrawCanvas(); manipulateCanvasMargin()">
@@ -24,6 +27,15 @@
         <option value="2">1/2 Tile</option>
         <option value="4">1/4 Tile</option>
     </select>
+    </div>
+    <div class="sep">|</div>
+    <div>
+        <label for="hints">Tile Location Hints</label>
+        <select id="hints" onchange="redrawCanvas()">
+            <option value="always">Always</option>
+            <option value="ambiguous" selected>When Ambiguous</option>
+            <option value="never">Never</option>
+        </select>
     </div>
     <div class="sep">|</div>
     <div id="ur-container">
@@ -93,12 +105,6 @@
                 <input id="dark-mode" name="dark-mode" type="checkbox"
                        onclick="setDarkMode(this.checked); document.styleSheets[0].insertRule('* {transition: background-color 0.25s linear, border 0.25s linear, box-shadow 0.25s linear}')">
                 <br/>
-                <label for="hints">Tile Location Hints</label>
-                <select id="hints" onchange="redrawCanvas()">
-                    <option value="always">Always</option>
-                    <option value="ambiguous" selected>When Ambiguous</option>
-                    <option value="never">Never</option>
-                </select>
             </div>
             <hr/>
         </div>
@@ -108,7 +114,6 @@
                 <p class="center">Click on a tile to start drawing it.</p>
                 <p class="center">Left Click - Draw</p>
                 <p class="center">Right Click - Erase</p>
-                <p class="center">Ctrl-Z/Y - Undo/Redo</p>
             </div>
             <div id="customizer" style="display: none">
                 <label for="custom-parent">Parent</label>
@@ -152,10 +157,18 @@
 
             </div>
             <div id="toolbar">
-                <div class="toolbar-item" id="eraser-button" data-type="tool" style="background-image: url('static/tiles/Eraser.png')">Eraser</div>
-                <div class="toolbar-item" id="player-button" data-type="tool" style="background-image: url('static/tiles/Player.png')">Player</div>
-                <div class="toolbar-item" id="custom-button" data-type="tool" style="background-image: url('static/tiles/Custom.png')">Customizer</div>
-                <div class="toolbar-item" id="csv-button" data-type="tool" style="background-image: url('static/tiles/BackgroundTool.png')">CSV Editor</div>
+                <div class="toolbar-item" id="eraser-button" data-type="tool"
+                     style="background-image: url('static/tiles/Eraser.png')">Eraser
+                </div>
+                <div class="toolbar-item" id="player-button" data-type="tool"
+                     style="background-image: url('static/tiles/Player.png')">Player
+                </div>
+                <div class="toolbar-item" id="custom-button" data-type="tool"
+                     style="background-image: url('static/tiles/Custom.png')">Customizer
+                </div>
+                <div class="toolbar-item" id="csv-button" data-type="tool"
+                     style="background-image: url('static/tiles/BackgroundTool.png')">CSV Editor
+                </div>
                 <hr/>
             </div>
         </div>
