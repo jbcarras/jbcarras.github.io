@@ -161,8 +161,8 @@ function moveTopBar(event) {
 
 
     function tbPos(event) {
-        topBar.style.top = event.clientY - offY + "px"
-        topBar.style.left = event.clientX - offX + "px"
+        topBar.style.top = Math.min(Math.max(event.clientY - offY, 0), document.body.clientHeight - topBar.getBoundingClientRect().height) + "px"
+        topBar.style.left = Math.min(Math.max(event.clientX - offX, 0), document.body.clientWidth - topBar.getBoundingClientRect().width) + "px"
         localStorage.setItem("tb", `${event.clientX - offX},${event.clientY - offY}`)
     }
 
