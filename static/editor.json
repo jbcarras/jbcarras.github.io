@@ -1,46 +1,10 @@
 {
-  "tasks": ["Task 1", "Task 2", "Task 3", "Task 4", "Task 5", "Task 6", "Bonus", "Mario"],
+  "tasks": ["Task 0"],
   "types": {
     "topdown": {
       "name": "TopDownLevel",
       "playerSprite": "static/tiles/Player.png",
       "playerWidth": 1,
-      "playerHeight": 1
-    },
-    "platformer": {
-      "name": "PlatformerLevel",
-      "playerSprite": "static/tiles/Player.png",
-      "playerWidth": 1,
-      "playerHeight": 1
-    },
-    "openworld": {
-      "name": "OpenWorldLevel",
-      "playerSprite": "static/tiles/Player.png",
-      "playerWidth": 1,
-      "playerHeight": 1
-    },
-    "sidescroller": {
-      "name": "SideScrollerLevel",
-      "playerSprite": "static/tiles/Player.png",
-      "playerWidth": 1,
-      "playerHeight": 1
-    },
-    "mario": {
-      "name": "MarioLevel",
-      "playerSprite": "static/tiles/Mario.png",
-      "playerWidth": 1,
-      "playerHeight": 1
-    },
-    "test1": {
-      "name": "Test (Taller Player)",
-      "playerSprite": "static/tiles/Turtle.png",
-      "playerWidth": 1,
-      "playerHeight": 1.5
-    },
-    "test2": {
-      "name": "Test (Wider Player)",
-      "playerSprite": "static/tiles/PipeEnd.png",
-      "playerWidth": 2,
       "playerHeight": 1
     }
   },
@@ -54,30 +18,12 @@
       "row": 0
     },
     {
-      "displayName": "smb_background.png",
-      "localFilename": "static/backgrounds/smb_background.png",
-      "engineFilename": "mario/smb_background.png",
-      "tiled":false
-    },
-    {
       "displayName": "Grass.png (0, 0)",
       "localFilename": "static/tiles/GrassBlue.png",
       "engineFilename": "MiniWorldSprites/Ground/Grass.png",
       "tiled": true,
       "col": 0,
       "row": 0
-    },
-    {
-      "displayName" : "mountains_1",
-      "localFilename": "static/backgrounds/mountains_1.png",
-      "engineFilename": "mountains/mountains_1/1.png,mountains/mountains_1/2.png,mountains/mountains_1/3.png,mountains/mountains_1/4.png,mountains/mountains_1/5.png",
-      "tiled":false
-    },
-    {
-      "displayName": "peaks_1",
-      "localFilename": "static/backgrounds/peaks_1.png",
-      "engineFilename": "peaks/peaks_1/1.png,peaks/peaks_1/2.png,peaks/peaks_1/3.png,peaks/peaks_1/4.png,peaks/peaks_1/5.png",
-      "tiled":false
     }
   ],
   "items": {
@@ -103,8 +49,8 @@
       "description": "Harms the player. May be able to move.",
       "parent": "DynamicGameObject",
       "attributes": [
-        {"name": "MaxHP", "defaultVal": 10, "inputType": "number"},
-        {"name": "Strength", "defaultVal": 3, "inputType": "number"}
+        {"name": "MaxHP", "defaultVal": 100, "inputType": "number"},
+        {"name": "Strength", "defaultVal": 30, "inputType": "number"}
       ],
       "url": "static/tiles/Enemy.png",
       "task": 1,
@@ -133,7 +79,7 @@
       "description": "A potion that heals players who come in contact.",
       "parent": "StaticGameObject",
       "attributes": [
-        {"name": "Heal", "defaultVal": 10, "inputType": "number"}
+        {"name": "Heal", "defaultVal": 100, "inputType": "number"}
       ],
       "url": "static/tiles/RedPotion.png",
       "task": 3,
@@ -144,7 +90,7 @@
       "description": "A potion that gets stored in a player's inventory to be consumed later.",
       "parent": "StaticGameObject",
       "attributes": [
-        {"name": "Heal", "defaultVal": 10, "inputType": "number"}
+        {"name": "Heal", "defaultVal": 100, "inputType": "number"}
       ],
       "url": "static/tiles/BluePotion.png",
       "task": 5,
@@ -182,8 +128,8 @@
       "description": "A smarter enemy that hunts the player down, avoiding walls.",
       "parent": "DynamicGameObject",
       "attributes": [
-        {"name": "MaxHP", "defaultVal": 10, "inputType": "number"},
-        {"name": "Strength", "defaultVal": 1, "inputType": "number"}
+        {"name": "MaxHP", "defaultVal": 100, "inputType": "number"},
+        {"name": "Strength", "defaultVal": 10, "inputType": "number"}
       ],
       "url": "static/tiles/SmartEnemy.png",
       "task": 6,
@@ -194,8 +140,8 @@
       "description": "An enemy who fires harmful arrows at the player.",
       "parent": "DynamicGameObject",
       "attributes": [
-        {"name": "MaxHP", "defaultVal": 10, "inputType": "number"},
-        {"name": "Strength", "defaultVal": 1, "inputType": "number"}],
+        {"name": "MaxHP", "defaultVal": 100, "inputType": "number"},
+        {"name": "Strength", "defaultVal": 10, "inputType": "number"}],
       "url": "static/tiles/Archer.png",
       "task": 7,
       "allowedTypes": ["topdown", "openworld"],
@@ -240,7 +186,7 @@
         {"name": "Text", "defaultVal": "", "inputType": "text"}
       ],
       "url": "static/tiles/InfoNode.png",
-      "task": 7,
+      "task": 1,
       "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"],
       "dimension": "1x1"
     },

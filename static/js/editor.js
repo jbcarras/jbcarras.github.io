@@ -149,7 +149,7 @@ function initEditor() {
             initBackgrounds(data["backgrounds"])
         renderToolbar()
         }).then(() => {initCanvas(); resetCanvas()
-        }).then(() => resetLevel())
+        }).then(() => { resetLevel(); clearUndo(); clearRedo(); document.getElementById("background-select").dispatchEvent(new Event("change")) } )
 }
 
 function moveTopBar(event) {
@@ -200,20 +200,25 @@ function initBackgrounds(backgrounds) {
         let select = document.createElement("option")
         select.value = bg.displayName
         select.textContent = bg.displayName
-        if (bg.tiled) {
-            document.getElementById("tile-group").append(select)
-        } else {
-            document.getElementById("bg-group").append(select)
-        }
+
+        selector.append(select)
+
+        // unneeded until real backgrounds are added
+
+        // if (bg.tiled) {
+        //     document.getElementById("tile-group").append(select)
+        // } else {
+        //     document.getElementById("bg-group").append(select)
+        // }
     }
     let custom = document.createElement("option")
     custom.value = "Custom"
     custom.textContent = "Custom"
-    selector.prepend(custom)
-    let lvlDefault = document.createElement("option")
-    lvlDefault.value = "Default"
-    lvlDefault.textContent = "Default"
-    selector.prepend(lvlDefault)
+    selector.append(custom)
+    // let lvlDefault = document.createElement("option")
+    // lvlDefault.value = "Default"
+    // lvlDefault.textContent = "Default"
+    // selector.prepend(lvlDefault)
     selector.children[0].selected = true
     selector.addEventListener("change", (event) => {
         if (event.target.value === "Custom") {
@@ -612,6 +617,7 @@ function toggleCSVEditor(to) {
 }
 
 function resetLevel() {
+    const level = levelToCSV()
     failed = []
     resetCanvas()
     setPlayerLocation("", "")
@@ -624,10 +630,15 @@ function resetLevel() {
         document.getElementById("csv-editor").style.display = "block"
         document.getElementById("csv-entry").value = levelToCSV()
     }
+
+    startRecording()
+    rememberStroke({"action":"load", "level":levelToCSV(), "replace":level})
+    endRecording()
 }
 
 function importLevel(file) {
     try {
+        const level = levelToCSV()
         const reader = new FileReader()
         reader.readAsText(file)
         reader.onload = () => {
@@ -639,6 +650,10 @@ function importLevel(file) {
                 sendAlert("Failed to parse level. Provided file does not match level format.")
             } else {
                 csvToLevel(reader.result.toString())
+                const newLevel = reader.result.toString()
+                startRecording()
+                rememberStroke({"action":"load", "level":newLevel, "replace":level})
+                endRecording()
             }
         }
     } catch (e) {

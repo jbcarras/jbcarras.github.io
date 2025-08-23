@@ -84,6 +84,10 @@ function invertAction(action) {
                 break
             case "resize":
                 break
+            case "load":
+                let level = stroke["level"]
+                stroke["level"] = stroke["replace"]
+                stroke["replace"] = level
         }
     }
     return invAction
@@ -116,6 +120,8 @@ function execAction(action) {
                 redrawCanvas()
                 manipulateCanvasMargin()
                 break
+            case "load":
+                csvToLevel(stroke["level"])
         }
     }
     redrawCanvas()
