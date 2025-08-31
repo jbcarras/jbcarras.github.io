@@ -97,13 +97,18 @@ function initEditor() {
     document.getElementById("custom-button").textContent = "Customizer"
     document.getElementById("csv-button").textContent = "CSV Editor"
 
+    const topBar = document.getElementById("top-bar")
     if (localStorage.getItem("tb") !== null) {
-        const topBar = document.getElementById("top-bar")
-        topBar.style.top = localStorage.getItem("tb").split(',')[1] + "px"
-        topBar.style.left = localStorage.getItem("tb").split(',')[0] + "px"
+        topBar.style.top = Math.max(Math.min(Number(localStorage.getItem("tb").split(',')[1]), document.body.clientHeight - topBar.getBoundingClientRect().height), 0) + "px"
+        topBar.style.left = Math.max(Math.min(Number(localStorage.getItem("tb").split(',')[0]), document.body.clientWidth - topBar.getBoundingClientRect().width), 0) + "px"
     }
 
     document.getElementById("tb-drag").addEventListener("mousedown", moveTopBar)
+
+    window.addEventListener("resize", () => {
+        topBar.style.top = Math.max(Math.min(Number(localStorage.getItem("tb").split(',')[1]), document.body.clientHeight - topBar.getBoundingClientRect().height), 0) + "px"
+        topBar.style.left = Math.max(Math.min(Number(localStorage.getItem("tb").split(',')[0]), document.body.clientWidth - topBar.getBoundingClientRect().width), 0) + "px"
+    })
 
     const reset = document.getElementById("reset")
     reset.addEventListener("click", resetLevel)
@@ -161,9 +166,12 @@ function moveTopBar(event) {
 
 
     function tbPos(event) {
-        topBar.style.top = Math.min(Math.max(event.clientY - offY, 0), document.body.clientHeight - topBar.getBoundingClientRect().height) + "px"
-        topBar.style.left = Math.min(Math.max(event.clientX - offX, 0), document.body.clientWidth - topBar.getBoundingClientRect().width) + "px"
-        localStorage.setItem("tb", `${event.clientX - offX},${event.clientY - offY}`)
+        let top = Math.min(Math.max(event.clientY - offY, 0), document.body.clientHeight - topBar.getBoundingClientRect().height)
+        let left = Math.min(Math.max(event.clientX - offX, 0), document.body.clientWidth - topBar.getBoundingClientRect().width)
+
+        topBar.style.top = top + "px"
+        topBar.style.left = left + "px"
+        localStorage.setItem("tb", `${left},${top}`)
     }
 
     document.querySelector(":root").style.setProperty("--global-cursor", "grabbing")
@@ -202,23 +210,11 @@ function initBackgrounds(backgrounds) {
         select.textContent = bg.displayName
 
         selector.append(select)
-
-        // unneeded until real backgrounds are added
-
-        // if (bg.tiled) {
-        //     document.getElementById("tile-group").append(select)
-        // } else {
-        //     document.getElementById("bg-group").append(select)
-        // }
     }
     let custom = document.createElement("option")
     custom.value = "Custom"
     custom.textContent = "Custom"
     selector.append(custom)
-    // let lvlDefault = document.createElement("option")
-    // lvlDefault.value = "Default"
-    // lvlDefault.textContent = "Default"
-    // selector.prepend(lvlDefault)
     selector.children[0].selected = true
     selector.addEventListener("change", (event) => {
         if (event.target.value === "Custom") {
