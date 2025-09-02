@@ -24,6 +24,18 @@
       "tiled": true,
       "col": 0,
       "row": 0
+    },
+    {
+      "displayName" : "mountains_1",
+      "localFilename": "static/backgrounds/mountains_1.png",
+      "engineFilename": "mountains/mountains_1/1.png,mountains/mountains_1/2.png,mountains/mountains_1/3.png,mountains/mountains_1/4.png,mountains/mountains_1/5.png",
+      "tiled":false
+    },
+    {
+      "displayName": "peaks_1",
+      "localFilename": "static/backgrounds/peaks_1.png",
+      "engineFilename": "peaks/peaks_1/1.png,peaks/peaks_1/2.png,peaks/peaks_1/3.png,peaks/peaks_1/4.png,peaks/peaks_1/5.png",
+      "tiled":false
     }
   ],
   "items": {
