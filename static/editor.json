@@ -141,7 +141,7 @@
       "parent": "DynamicGameObject",
       "attributes": [
         {"name": "MaxHP", "defaultVal": 100, "inputType": "number"},
-        {"name": "Strength", "defaultVal": 10, "inputType": "number"}
+        {"name": "Strength", "defaultVal": 30, "inputType": "number"}
       ],
       "url": "static/tiles/SmartEnemy.png",
       "task": 6,
