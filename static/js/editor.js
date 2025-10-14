@@ -240,7 +240,7 @@ function initTasks(tasks) {
     let dropdown = document.getElementById("task")
     for (let i = 0; i < tasks.length; i++) {
         let task = document.createElement("option")
-        task.value = (i+1).toString()
+        task.value = (i).toString()
         task.textContent = tasks[i]
         dropdown.append(task)
     }
