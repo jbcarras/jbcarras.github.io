@@ -1,5 +1,5 @@
 {
-  "tasks": ["Task 0", "Task 1", "Task 2"],
+  "tasks": ["Task 0", "Task 1", "Task 2", "Task 3"],
   "types": {
     "topdown": {
       "name": "TopDownLevel",
@@ -86,7 +86,7 @@
       "parent": "StaticGameObject",
       "attributes": [],
       "url": "static/tiles/Axe.png",
-      "task": 5,
+      "task": 3,
       "allowedTypes": ["topdown", "openworld"],
       "dimension": "1x1"
     },
@@ -106,7 +106,7 @@
         {"name": "Heal", "defaultVal": 100, "inputType": "number"}
       ],
       "url": "static/tiles/RedPotion.png",
-      "task": 3,
+      "task": 4,
       "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"],
       "dimension": "1x1"
     },
@@ -117,7 +117,7 @@
         {"name": "Heal", "defaultVal": 100, "inputType": "number"}
       ],
       "url": "static/tiles/BluePotion.png",
-      "task": 5,
+      "task": 3,
       "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"],
       "dimension": "1x1"
     },
@@ -135,7 +135,7 @@
       "parent": "StaticGameObject",
       "attributes": [],
       "url": "static/tiles/Magic.png",
-      "task": 5,
+      "task": 3,
       "allowedTypes": ["topdown", "openworld"],
       "dimension": "1x1"
     },
@@ -144,7 +144,7 @@
       "parent": "StaticGameObject",
       "attributes": [],
       "url": "static/tiles/Spike.png",
-      "task": 3,
+      "task": 4,
       "allowedTypes": ["topdown", "platformer", "openworld", "sidescroller"],
       "dimension": "1x1"
     },

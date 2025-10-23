@@ -244,7 +244,7 @@ function initTasks(tasks) {
         task.textContent = tasks[i]
         dropdown.append(task)
     }
-    task = dropdown.children.length
+    task = dropdown.children.length - 1
     dropdown.children[dropdown.children.length-1].selected = true
 }
 
